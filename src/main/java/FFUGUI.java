@@ -36,7 +36,7 @@ public class FFUGUI extends Application implements Runnable{
                 int col = ((int) Math.floor(event.getSceneY() / 100));
 
                 if(boxes[row][col].get()) {
-                    boxes[row][col].close();
+                    boxes[row][col].close("");
 
                 } else {
                     boxes[row][col].open();
@@ -46,7 +46,7 @@ public class FFUGUI extends Application implements Runnable{
             }
         });
 
-        primaryStage.setTitle("FFU");
+        primaryStage.setTitle("FFU - Automation Layer");
         primaryStage.setScene(scene);
         primaryStage.getIcons().add(new Image("https://www.contegix.com/wp-content/uploads/2017/11/snow-cold-flake-snowfall-snowflake-weather-388d22cfbc51ea26-512x512.png"));
         primaryStage.show();
@@ -58,7 +58,7 @@ public class FFUGUI extends Application implements Runnable{
     }
 
     public void close(int row, int col){
-        boxes[row][col].close();
+        boxes[row][col].close("");
     }
 
     public boolean get(int row, int col){
