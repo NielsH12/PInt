@@ -4,6 +4,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -31,11 +32,11 @@ public class Box{
         red.setStrokeWidth(1);
 
         // Label
-        label = new Text(x,y+50, "Label");
+        label = new Text(x,y+50, "Empty");
+
         label.setTextAlignment(TextAlignment.CENTER);
         label.setWrappingWidth(150);
-        Font t = new Font(14);
-        label.setFont(t);
+        label.setFont(Font.font("Verdana", FontPosture.ITALIC, 14));
 
         group = new Group(rectangle);
         group.getChildren().add(green);
@@ -52,6 +53,8 @@ public class Box{
         label.setText("");
 
         open = true;
+        isEmpty = true;
+        label.setFont(Font.font("Verdana", FontPosture.ITALIC, 14));
     }
 
     public void close(String _label){
@@ -62,15 +65,15 @@ public class Box{
 
         if (_label == ""){
             label.setText("Empty");
+            isEmpty = true;
+            label.setFont(Font.font("Verdana", FontPosture.ITALIC, 14));
         } else {
             label.setText(_label);
+            isEmpty = false;
+            label.setFont(Font.font("Verdana", FontPosture.REGULAR, 16));
         }
 
         open = false;
-    }
-
-    public boolean get(){
-        return open;
     }
 
     Group group;
@@ -84,11 +87,14 @@ public class Box{
     private Color greenCircleOpen = new Color(0,0.79,0,1);
     private Color border = new Color(0,0,0,1);
 
+
+
     // Shapes
     private Rectangle rectangle;
     private Circle green;
     private Circle red;
 
-    private boolean open = false;
+    public boolean open = false;
+    public boolean isEmpty = true;
     private Text label;
 }
