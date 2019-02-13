@@ -6,16 +6,50 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FFUGUI extends Application implements Runnable{
 
-    static Box[][] boxes = new Box[4][3];
-    boolean open = false;
+    private static Box[][] boxes;
+    private  static List<Pos> empty;
+
+    public FFUGUI(Box[][] _boxes, List<Pos> _empty){
+        boxes = _boxes;
+        empty = _empty;
+    }
 
     public FFUGUI(){
 
     }
 
+    // Open a storage slot
+    public void open(Pos pos){
+        // TODO: AUTOCLOSE AFTER TIMEOUT
+
+        empty.add(pos);
+        boxes[pos.x][pos.y].open();
+    }
+
+    // Close storage slot (no contents)
+    public void close(Pos pos){
+        boxes[pos.x][pos.y].close("");
+    }
+
+    // Store contents at some empty storage slot
+    public Pos store(String id){
+        if (!empty.isEmpty()){
+            Pos pos = empty.remove(0);
+
+            boxes[pos.x][pos.y].close(id);
+            return pos;
+        }
+
+        return new Pos(-1,-1); // Maybe replace with throwing an error
+    }
+
+    // GUI stuff
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -35,14 +69,13 @@ public class FFUGUI extends Application implements Runnable{
                 int row = ((int) Math.floor(event.getSceneX() / 150));
                 int col = ((int) Math.floor(event.getSceneY() / 100));
 
-                if(boxes[row][col].get()) {
-                    boxes[row][col].close("");
+                Pos t = new Pos(row,col);
 
+                if(boxes[t.x][t.y].open) {
+                    close(t);
                 } else {
-                    boxes[row][col].open();
+                    open(t);
                 }
-
-
             }
         });
 
@@ -50,28 +83,9 @@ public class FFUGUI extends Application implements Runnable{
         primaryStage.setScene(scene);
         primaryStage.getIcons().add(new Image("https://www.contegix.com/wp-content/uploads/2017/11/snow-cold-flake-snowfall-snowflake-weather-388d22cfbc51ea26-512x512.png"));
         primaryStage.show();
-
-    }
-
-    public void open(int row, int col){
-        boxes[row][col].open();
-    }
-
-    public void close(int row, int col){
-        boxes[row][col].close("");
-    }
-
-    public boolean get(int row, int col){
-        return boxes[row][col].get();
     }
 
     public void run() {
-        for (int i = 0; i < 4; i++){
-            for (int j = 0; j < 3; j++){
-                boxes[i][j] = new Box(150 * i, 100 * j, 150,100);
-            }
-        }
-
         launch();
     }
 }
