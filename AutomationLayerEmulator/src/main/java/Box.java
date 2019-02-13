@@ -32,8 +32,7 @@ public class Box{
         red.setStrokeWidth(1);
 
         // Label
-        label = new Text(x,y+50, "Empty");
-
+        label = new Text(x,y + 50, "Empty");
         label.setTextAlignment(TextAlignment.CENTER);
         label.setWrappingWidth(150);
         label.setFont(Font.font("Verdana", FontPosture.ITALIC, 14));
@@ -86,8 +85,6 @@ public class Box{
     private Color greenCircleClosed = new Color(0,0.16,0,1);
     private Color greenCircleOpen = new Color(0,0.79,0,1);
     private Color border = new Color(0,0,0,1);
-
-
 
     // Shapes
     private Rectangle rectangle;

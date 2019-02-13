@@ -1,10 +1,14 @@
+import javafx.application.Application;
+import javafx.embed.swing.JFXPanel;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static spark.Spark.stop;
 
-public class Main {
+public class AutomationLayer {
     public static void main(String[] args) throws InterruptedException{
+        JFXPanel jfxPanel = new JFXPanel(); //Instantiate JFXPanel to force initialization of JavaFX Toolkit
 
         Box[][] boxes = new Box[4][3];
         List<Pos> empty = new ArrayList<>();
@@ -24,8 +28,8 @@ public class Main {
         rest.start();
 
         while(gui.isAlive()) {
-                Thread.sleep(1000);
-            }
+            Thread.sleep(1000);
+        }
 
         stop();
     }

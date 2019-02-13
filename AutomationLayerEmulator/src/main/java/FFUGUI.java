@@ -1,19 +1,17 @@
 import javafx.application.Application;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class FFUGUI extends Application implements Runnable{
 
     private static Box[][] boxes;
-    private  static List<Pos> empty;
+    private static List<Pos> empty;
 
     public FFUGUI(Box[][] _boxes, List<Pos> _empty){
         boxes = _boxes;
@@ -46,13 +44,12 @@ public class FFUGUI extends Application implements Runnable{
             return pos;
         }
 
-        return new Pos(-1,-1); // Maybe replace with throwing an error
+        return new Pos(-1,-1); // TODO: Maybe replace with throwing an error
     }
 
     // GUI stuff
     @Override
     public void start(Stage primaryStage) throws Exception{
-
         Group root = new Group();
 
         for (int i = 0; i < 4; i++){
@@ -85,7 +82,5 @@ public class FFUGUI extends Application implements Runnable{
         primaryStage.show();
     }
 
-    public void run() {
-        launch();
-    }
+    public void run() { launch(); }
 }

@@ -2,18 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ffu-back</artifactId>
+        <groupId>dk.nielshvid.ffu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dk.nielshvid.ffu</groupId>
-    <artifactId>ffu-back</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <modules>
-        <module>StorageManagement</module>
-        <module>AutomationLayerEmulator</module>
-        <module>ServiceEmulator</module>
-        <module>Intermediator</module>
-    </modules>
+    <artifactId>AutomationLayerEmulator</artifactId>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -36,11 +32,5 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.5</version>
         </dependency>
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>7.2.0.jre8</version>
-        </dependency>
     </dependencies>
-
 </project>
