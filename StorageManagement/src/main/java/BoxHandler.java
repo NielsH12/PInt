@@ -6,10 +6,10 @@ class BoxHandler {
 
     private static String connectionUrl = "jdbc:sqlserver://localhost;;user=jba;password=123";
 
-    String GetBoxInfoByID(int BoxID)  {
+    String GetBoxInfoByID(String BoxID)  {
         String Query = "SELECT * FROM [ffu].[dbo].[Box] WHERE id =?";
 
-        return SendBoxQuery(Query, String.valueOf(BoxID));
+        return SendBoxQuery(Query,BoxID);
     }
 
     private String SendBoxQuery(String Query, String BoxID){
@@ -27,10 +27,14 @@ class BoxHandler {
             }
             String result = "";
             while(rs.next()){
-                result = rs.getString("owner") +
-                        rs.getString("ID") +
-                        rs.getString("posX") +
-                        rs.getString("posY");
+                result = "" +
+                        rs.getString("owner") +  " " +
+                        rs.getString("id") + " " +
+                        rs.getTimestamp("created") + " " +
+                        rs.getTimestamp("accessed") + " " +
+                        rs.getTimestamp("expiration") + " " +
+                        rs.getInt("posX") + " " +
+                        rs.getInt("posY");
             }
 
             return result;

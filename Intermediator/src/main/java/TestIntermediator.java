@@ -5,6 +5,6 @@ public class TestIntermediator {
 
         BoxHandler bh = new BoxHandler();
 
-        System.out.println(bh.GetBoxInfoByID(2));
+        System.out.println(bh.GetBoxInfoByID("A70D717E-935E-4CA2-8192-22E65D84BF71"));
     }
 }
