@@ -5,9 +5,9 @@ public class TestSQL {
 
         BoxHandler boxHandler = new BoxHandler();
 
-        String result = boxHandler.GetBoxInfoByID("A70D717E-935E-4CA2-8192-22E65D84BF71");
+        dbBox result = boxHandler.GetBoxInfoByID("A70D717E-935E-4CA2-8192-22E65D84BF71");
 
-        System.out.println(result);
+        System.out.println(result.created);
 
     }
 }
