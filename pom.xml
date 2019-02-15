@@ -13,7 +13,7 @@
         <module>AutomationLayerEmulator</module>
         <module>ServiceEmulator</module>
         <module>Intermediator</module>
-        <module>Tommy2</module>
+        <module>Jersey1</module>
     </modules>
 
     <properties>
