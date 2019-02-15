@@ -13,6 +13,7 @@
         <module>AutomationLayerEmulator</module>
         <module>ServiceEmulator</module>
         <module>Intermediator</module>
+        <module>Tommy2</module>
     </modules>
 
     <properties>
