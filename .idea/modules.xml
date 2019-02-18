@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AutomationLayerEmulator/AutomationLayerEmulator.iml" filepath="$PROJECT_DIR$/AutomationLayerEmulator/AutomationLayerEmulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FFUBACKEND.iml" filepath="$PROJECT_DIR$/.idea/FFUBACKEND.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Intermediator/Intermediator.iml" filepath="$PROJECT_DIR$/Intermediator/Intermediator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Jersey1/Jersey1.iml" filepath="$PROJECT_DIR$/Jersey1/Jersey1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ServiceEmulator/ServiceEmulator.iml" filepath="$PROJECT_DIR$/ServiceEmulator/ServiceEmulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StorageManagement/StorageManagement.iml" filepath="$PROJECT_DIR$/StorageManagement/StorageManagement.iml" />
+    </modules>
+  </component>
+</project>
