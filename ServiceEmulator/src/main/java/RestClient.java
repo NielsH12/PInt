@@ -24,6 +24,10 @@ public class RestClient {
         return client.target(REST_URI + "open?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get();
     }
 
+    public static Response insertBoxByID(String ID){
+        return client.target(REST_URI + "insert?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get();
+    }
+
     public static void main(String[] args){
         System.out.println(test().readEntity(String.class));
     }
