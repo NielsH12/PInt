@@ -10,7 +10,7 @@ public class BoxHandler {
 
     public static BoxHandler boxHandler = new BoxHandler();
 
-    public static BoxHandler getInstance(){return boxHandler;};
+    public static BoxHandler getInstance(){return boxHandler;}
 
     public dbBox GetBoxInfoByID(String BoxID)  {
 
@@ -30,14 +30,15 @@ public class BoxHandler {
 
     private dbBox SendBoxQuery(String Query, String BoxID){
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            System.out.println("SQLServerDriver");
         } catch (Exception e){
 
         }
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
 
-            PreparedStatement  stmt = con.prepareStatement(Query);
+            PreparedStatement stmt = con.prepareStatement(Query);
 
             stmt.setString(1, BoxID);
 
