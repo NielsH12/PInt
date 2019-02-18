@@ -4,8 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dk.nielshvid.ffu</groupId>
-    <artifactId>Jersey1</artifactId>
+    <parent>
+        <artifactId>ffu-back</artifactId>
+        <groupId>dk.nielshvid.ffu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>dk.nielshvid.IntermediatorRest</groupId>
+    <artifactId>IntermediatorRest</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencyManagement>
@@ -24,6 +30,12 @@
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dk.nielshvid.ffu</groupId>
+            <artifactId>StorageManagement</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

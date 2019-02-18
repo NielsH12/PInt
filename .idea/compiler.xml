@@ -8,7 +8,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="AutomationLayerEmulator" />
         <module name="Intermediator" />
-        <module name="Jersey1" />
+        <module name="IntermediatorRest" />
+        <module name="Jersey1 (1)" />
         <module name="ServiceEmulator" />
         <module name="StorageManagement" />
       </profile>
@@ -17,7 +18,9 @@
       <module name="AutomationLayerEmulator" target="1.8" />
       <module name="FFUBACKEND" target="1.8" />
       <module name="Intermediator" target="1.8" />
+      <module name="IntermediatorRest" target="1.8" />
       <module name="Jersey1" target="1.5" />
+      <module name="Jersey1 (1)" target="1.5" />
       <module name="ServiceEmulator" target="1.8" />
       <module name="StorageManagement" target="1.8" />
       <module name="Tommy2" target="1.8" />
