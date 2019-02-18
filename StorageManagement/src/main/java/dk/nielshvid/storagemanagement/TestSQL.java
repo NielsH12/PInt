@@ -1,4 +1,4 @@
-import java.sql.*;
+package dk.nielshvid.storagemanagement;
 
 public class TestSQL {
     public static void main(String[] args) {

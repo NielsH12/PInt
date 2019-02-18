@@ -1,3 +1,5 @@
+package dk.nielshvid.storagemanagement;
+
 import java.util.Date;
 
 public class dbBox {

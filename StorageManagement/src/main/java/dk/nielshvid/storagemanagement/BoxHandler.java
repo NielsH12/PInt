@@ -1,12 +1,18 @@
+package dk.nielshvid.storagemanagement;
+
 import java.sql.*;
 import java.util.EmptyStackException;
 
 
-class BoxHandler {
+public class BoxHandler {
 
-    private static String connectionUrl = "jdbc:sqlserver://localhost;;user=jba;password=123";
+    private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
-    dbBox GetBoxInfoByID(String BoxID)  {
+    public static BoxHandler boxHandler = new BoxHandler();
+
+    public static BoxHandler getInstance(){return boxHandler;};
+
+    public dbBox GetBoxInfoByID(String BoxID)  {
 
         String Query = "SELECT Box.id" +
         ", Persons.firstName" +
@@ -23,7 +29,13 @@ class BoxHandler {
     }
 
     private dbBox SendBoxQuery(String Query, String BoxID){
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (Exception e){
+
+        }
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
+
 
             PreparedStatement  stmt = con.prepareStatement(Query);
 
