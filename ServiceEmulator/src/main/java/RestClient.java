@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class RestClient {
 
-    private static final String REST_URI = "http://localhost:8080/";
+    private static final String REST_URI = "http://localhost:8081/";
     private static Client client = ClientBuilder.newClient();
 
     public static Response test(){

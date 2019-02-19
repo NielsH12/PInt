@@ -7,7 +7,7 @@ public class dbBox {
     }
 
     String id;
-    String firstName;
+    public String firstName;
     String lastName;
     String email;
     Date created;

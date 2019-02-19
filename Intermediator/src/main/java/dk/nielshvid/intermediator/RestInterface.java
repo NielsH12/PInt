@@ -24,21 +24,21 @@ public class RestInterface {
 
     @Path("get")
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String get(@QueryParam("ID") String ID)  {
         return Intermediator.lookup(ID);
     }
 
     @Path("open")
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String open(@QueryParam("ID") String ID)  {
         return Intermediator.lookup(ID);
     }
 
     @Path("insert")
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String insert(@QueryParam("ID") String ID)  {
         return Intermediator.lookup(ID);
     }
