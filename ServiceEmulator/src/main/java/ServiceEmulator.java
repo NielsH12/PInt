@@ -28,6 +28,11 @@ public class ServiceEmulator {
 
         Response r = RC.getBoxInfoByID(input);
 
+        if(r.getStatus() == 200){
+
+            System.out.println("Halli halløj vi fik en 200");
+        }
+
         dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
         System.out.println(t.firstName);
 
