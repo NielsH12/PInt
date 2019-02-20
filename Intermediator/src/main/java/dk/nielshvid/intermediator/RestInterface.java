@@ -1,17 +1,9 @@
 package dk.nielshvid.intermediator;
 
-//import com.fasterxml.jackson.core.JsonProcessingException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.fasterxml.jackson.databind.ObjectWriter;
-
-//import dk.nielshvid.storagemanagement.BoxHandler;
-//import dk.nielshvid.storagemanagement.dbBox;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.UUID;
 
 @Path("/")
 public class RestInterface {
@@ -25,21 +17,28 @@ public class RestInterface {
     @Path("get")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@QueryParam("ID") String ID)  {
-        return Intermediator.lookup(ID);
+    public String get(@QueryParam("ID") UUID ID)  {
+        if(ID != null) {
+            String result = Intermediator.lookup(ID);
+            if(result != null)
+                return result;
+
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        }
+        throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
 
     @Path("open")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String open(@QueryParam("ID") String ID)  {
-        return Intermediator.lookup(ID);
+        return Intermediator.lookup(UUID.fromString(ID));
     }
 
     @Path("insert")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String insert(@QueryParam("ID") String ID)  {
-        return Intermediator.lookup(ID);
+        return Intermediator.lookup(UUID.fromString(ID));
     }
 }

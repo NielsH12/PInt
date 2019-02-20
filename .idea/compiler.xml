@@ -9,7 +9,6 @@
         <module name="AutomationLayerEmulator" />
         <module name="AutomationLayerSimulator" />
         <module name="Intermediator" />
-        <module name="Jersey1" />
         <module name="ServiceEmulator" />
         <module name="StorageManagement" />
       </profile>
@@ -18,11 +17,9 @@
       <module name="AutomationLayerEmulator" target="1.8" />
       <module name="AutomationLayerSimulator" target="1.8" />
       <module name="FFUBACKEND" target="1.8" />
-      <module name="Intermediator" target="1.5" />
-      <module name="Jersey1" target="1.5" />
+      <module name="Intermediator" target="8" />
       <module name="ServiceEmulator" target="1.8" />
       <module name="StorageManagement" target="1.8" />
-      <module name="Tommy2" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
