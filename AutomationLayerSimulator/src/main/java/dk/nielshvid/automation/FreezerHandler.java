@@ -19,7 +19,6 @@ public class FreezerHandler {
     private static boolean updateFreezerState(String Query, int x, int y, String id, boolean closed){
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            System.out.println("SQLServerDriver");
         } catch (Exception e){
 
         }

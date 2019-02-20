@@ -8,9 +8,11 @@ public class BoxHandler {
 
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
-    public static BoxHandler boxHandler = new BoxHandler();
+    public BoxHandler(){
 
-    public static BoxHandler getInstance(){return boxHandler;}
+    }
+
+
 
     public dbBox GetBoxInfoByID(String BoxID)  {
 
@@ -29,11 +31,12 @@ public class BoxHandler {
     }
 
     private dbBox SendBoxQuery(String Query, String BoxID){
+        System.out.println("Sending box query for box: " + BoxID);
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             System.out.println("SQLServerDriver");
         } catch (Exception e){
-
+            System.out.println("Got caught on first try-catch (Connection error)");
         }
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
@@ -46,6 +49,7 @@ public class BoxHandler {
 
             // Iterate through the data in the result set and display it.
             if (rs == null){
+                System.out.println("rs was null");
                 throw new EmptyStackException();
             }
 
@@ -66,6 +70,7 @@ public class BoxHandler {
         // Handle any errors that may have occurred.
         catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Got caught on second try-catch (SQL error)");
             return null;
         }
     }
