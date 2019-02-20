@@ -5,6 +5,7 @@ import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.UUID;
 
 
 //A70D717E-935E-4CA2-8192-22E65D84BF71
@@ -26,16 +27,28 @@ public class ServiceEmulator {
         System.out.println("Enter ID of the box");
         input = br.readLine();
 
-        Response r = RC.getBoxInfoByID(input);
-
-        if(r.getStatus() == 200){
-
-            System.out.println("Halli halløj vi fik en 200");
+        try{
+            UUID uuid = UUID.fromString(input);
+            //do something
+        } catch (IllegalArgumentException exception){
+            System.out.println("Not valid UUID");
+            return;
         }
 
-        dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
-        System.out.println(t.firstName);
+        Response r = RC.getBoxInfoByID(input);
 
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
+            return;
+        }
+
+        try {
+            dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
+            System.out.println(t.firstName);
+        } catch (Exception e){
+            System.out.println("Response could not be converted to dbBox.class");
+        }
     }
 
     private static void open() throws IOException{
