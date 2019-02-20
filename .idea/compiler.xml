@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="AutomationLayerEmulator" />
+        <module name="AutomationLayerSimulator" />
         <module name="Intermediator" />
         <module name="Jersey1" />
         <module name="ServiceEmulator" />
@@ -15,6 +16,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="AutomationLayerEmulator" target="1.8" />
+      <module name="AutomationLayerSimulator" target="1.8" />
       <module name="FFUBACKEND" target="1.8" />
       <module name="Intermediator" target="1.5" />
       <module name="Jersey1" target="1.5" />

@@ -18,7 +18,7 @@
 <h1>${it.hello} ${it.world}</h1>
 
 
-<table border="1" style="text-align: center">
+<table align="center" border="1" style="text-align: center">
     <tr height="60px">
         <td width="320px">${it.s00}</td>
         <td width="320px">${it.s10}</td>
