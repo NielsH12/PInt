@@ -39,36 +39,51 @@ public class RestInterface {
         return new Viewable("/index", model);
     }
 
+    /*
     @Path("open")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String open(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
         if (FreezerHandler.updateByPos(x,y,null, false)){
             return "success";
-        };
+        }
+
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+    */
+
+    @Path("retrieve")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String retrieve(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
+        if (FreezerHandler.updateByPos(x,y,null)){
+            return "success";
+        }
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
 
     @Path("insert")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public String insert(@QueryParam("ID") String ID, @QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
-        if (FreezerHandler.updateByPos(x,y,ID, true)){
+        if (FreezerHandler.updateByPos(x,y,ID)){
             return "success";
-        };
+        }
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
 
+    /*
     @Path("close")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public String close(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
         if (FreezerHandler.updateByPos(x,y,null, true)){
             return "success";
-        };
+        }
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
+    */
 }
