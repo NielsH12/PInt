@@ -2,6 +2,7 @@ package dk.nielshvid.storagemanagement;
 
 import java.sql.*;
 import java.util.EmptyStackException;
+import java.util.UUID;
 
 
 public class BoxHandler {
@@ -14,7 +15,7 @@ public class BoxHandler {
 
 
 
-    public dbBox GetBoxInfoByID(String BoxID)  {
+    public dbBox GetBoxInfoByID(UUID BoxID)  {
 
         String Query = "SELECT Box.id" +
         ", Persons.firstName" +
@@ -30,7 +31,7 @@ public class BoxHandler {
         return SendBoxQuery(Query,BoxID);
     }
 
-    private dbBox SendBoxQuery(String Query, String BoxID){
+    private dbBox SendBoxQuery(String Query, UUID BoxID){
         System.out.println("Sending box query for box: " + BoxID);
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -43,7 +44,7 @@ public class BoxHandler {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            stmt.setString(1, BoxID);
+            stmt.setString(1, BoxID.toString());
 
             ResultSet rs = stmt.executeQuery();
 
@@ -51,6 +52,11 @@ public class BoxHandler {
             if (rs == null){
                 System.out.println("rs was null");
                 throw new EmptyStackException();
+            }
+
+            if (!rs.next() ) {
+                System.out.println("fisk");
+               return null;
             }
 
             dbBox result = new dbBox();
