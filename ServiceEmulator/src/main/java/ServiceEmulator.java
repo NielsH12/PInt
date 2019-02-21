@@ -5,44 +5,92 @@ import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.UUID;
 
 
 //A70D717E-935E-4CA2-8192-22E65D84BF71
 public class ServiceEmulator {
 
-    static RestClient RC;
-    static BufferedReader br;
-    static String input;
-    static Gson gs = new Gson();
+    private static BufferedReader br;
+    private static String input;
+    private static Gson gs = new Gson();
 
     private static void insert() throws IOException{
+        String input ="";
+
         System.out.println("Enter ID of the box to insert");
         input = br.readLine();
 
-        Response r = RC.insertBoxByID(input);
+        if (!verifyID(input)){
+            return;
+        }
+
+        Response r = RestClient.insertBoxByID(input);
+
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
+            return;
+        }
     }
 
     private static void get() throws IOException{
         System.out.println("Enter ID of the box");
         input = br.readLine();
 
-        Response r = RC.getBoxInfoByID(input);
+        if (!verifyID(input)){
+            System.out.println("Not valid id");
+            return;
+        }
 
-        dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
-        System.out.println(t.firstName);
+        Response r = RestClient.getBoxInfoByID(input);
 
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
+            return;
+        }
+
+        try {
+            dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
+            System.out.println("First name: " + t.firstName);
+            System.out.println("Last name: " + t.lastName);
+            System.out.println("Email: " + t.email);
+            System.out.println("Created: " + t.created);
+            System.out.println("Expiration: " + t.expiration);
+        } catch (Exception e){
+            System.out.println("Response could not be converted to dbBox.class");
+        }
     }
 
     private static void open() throws IOException{
         System.out.println("Enter ID of the box to retrieve");
         input = br.readLine();
 
-        Response r = RC.openBoxByID(input);
+        if (!verifyID(input)){
+            System.out.println("Not valid id");
+            return;
+        }
+
+        Response r = RestClient.openBoxByID(input);
+
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
+        }
+    }
+
+    private static boolean verifyID(String id){
+        try{
+            UUID uuid = UUID.fromString(input);
+            return true;
+        } catch (IllegalArgumentException exception){
+            return false;
+        }
     }
 
     public static void main(String[] args) throws IOException {
         br = new BufferedReader(new InputStreamReader(System.in));
-        RC = new RestClient();
 
         while (true){
             System.out.println("Enter command (get, open, insert)");

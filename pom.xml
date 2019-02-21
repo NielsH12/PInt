@@ -10,7 +10,6 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>StorageManagement</module>
-        <module>AutomationLayerEmulator</module>
         <module>ServiceEmulator</module>
         <module>Intermediator</module>
         <module>AutomationLayerSimulator</module>

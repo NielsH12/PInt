@@ -15,17 +15,15 @@ public class RestClient {
     }
 
     public static Response getBoxInfoByID(String ID){
-        return client.target(REST_URI + "get?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get();
+        return client.target(REST_URI + "get?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get(); // GET
     }
 
-    // return client.target(REST_URI).request(MediaType.APPLICATION_JSON).post(Entity.entity(emp, MediaType.APPLICATION_JSON));
-
     public static Response openBoxByID(String ID){
-        return client.target(REST_URI + "open?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get();
+        return client.target(REST_URI + "open?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get(); // OPEN
     }
 
     public static Response insertBoxByID(String ID){
-        return client.target(REST_URI + "insert?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get();
+        return client.target(REST_URI + "insert?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get(); // INSERT
     }
 
     public static void main(String[] args){
