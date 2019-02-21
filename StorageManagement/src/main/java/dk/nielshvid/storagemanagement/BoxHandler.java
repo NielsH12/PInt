@@ -13,8 +13,6 @@ public class BoxHandler {
 
     }
 
-
-
     public dbBox GetBoxInfoByID(UUID BoxID)  {
 
         String Query = "SELECT Box.id" +
@@ -26,25 +24,20 @@ public class BoxHandler {
         ", expiration" +
         ", posX" +
         ", posY " +
-        "FROM [ffu].[dbo].[Box] INNER JOIN [ffu].[dbo].[Persons] ON Box.owner = Persons.id WHERE Box.id = ?";
+        "FROM [ffu].[dbo].[Box] INNER JOIN [ffu].[dbo].[Persons] ON Box.owner = Persons.id WHERE Box.id =?";
 
         return SendBoxQuery(Query,BoxID);
     }
 
     private dbBox SendBoxQuery(String Query, UUID BoxID){
-        System.out.println("Sending box query for box: " + BoxID);
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            System.out.println("SQLServerDriver");
-        } catch (Exception e){
-            System.out.println("Got caught on first try-catch (Connection error)");
-        }
+        CheckDrivers(BoxID);
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
-
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            stmt.setString(1, BoxID.toString());
+            System.out.println(BoxID.toString());
+
+            stmt.setString(1, BoxID.toString().toUpperCase());
 
             ResultSet rs = stmt.executeQuery();
 
@@ -54,10 +47,10 @@ public class BoxHandler {
                 throw new EmptyStackException();
             }
 
-            if (!rs.next() ) {
-                System.out.println("fisk");
-               return null;
-            }
+//            if (!rs.next() ) {
+//                System.out.println("fisk");
+//               return null;
+//            }
 
             dbBox result = new dbBox();
             while(rs.next()) {
@@ -78,6 +71,43 @@ public class BoxHandler {
             e.printStackTrace();
             System.out.println("Got caught on second try-catch (SQL error)");
             return null;
+        }
+    }
+
+    public int OpenBoxByID(UUID BoxID)  {
+
+        String Query = "UPDATE [ffu].[dbo].[Box] SET accessed = GETDATE(), posX = -1, posY = -1 WHERE Box.id =?";
+
+        return OpenBox(Query,BoxID);
+    }
+
+    private int OpenBox(String Query, UUID BoxID){
+        CheckDrivers(BoxID);
+        try (Connection con = DriverManager.getConnection(connectionUrl)) {
+
+            PreparedStatement stmt = con.prepareStatement(Query);
+
+            String id = BoxID.toString();
+
+            stmt.setString(1, id);
+
+            return stmt.executeUpdate();
+        }
+        // Handle any errors that may have occurred.
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Got caught on second try-catch (SQL error)");
+            return 0;
+        }
+    }
+
+    private static void CheckDrivers(UUID BoxID) {
+        System.out.println("Sending box query for box: " + BoxID);
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            System.out.println("SQLServerDriver");
+        } catch (Exception e){
+            System.out.println("Got caught on first try-catch (Connection error)");
         }
     }
 }
