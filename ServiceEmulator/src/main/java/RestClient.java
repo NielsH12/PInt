@@ -15,7 +15,7 @@ public class RestClient {
     }
 
     public static Response getBoxInfoByID(String ID){
-        return client.target(REST_URI + "get?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get();
+        return client.target(REST_URI + "get?ID=" + ID).request(MediaType.APPLICATION_JSON_TYPE).get(); // GET
     }
 
     public static Response openBoxByID(String ID){

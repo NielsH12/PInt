@@ -11,31 +11,41 @@ import java.util.UUID;
 //A70D717E-935E-4CA2-8192-22E65D84BF71
 public class ServiceEmulator {
 
-    static RestClient RC;
-    static BufferedReader br;
-    static String input;
-    static Gson gs = new Gson();
+    private static BufferedReader br;
+    private static String input;
+    private static Gson gs = new Gson();
 
     private static void insert() throws IOException{
-        System.out.println("Enter ID of the box to insert");
-        input = br.readLine();
+        String boxID ="";
+        String nameID ="";
 
-        Response r = RC.insertBoxByID(input);
+        System.out.println("Enter ID of the box to insert");
+        boxID = br.readLine();
+
+        if (!verifyID(boxID)){
+            return;
+        }
+
+        System.out.println("Enter ID of the person inserting the box");
+        nameID = br.readLine();
+
+        if (!verifyID(nameID)){
+            return;
+        }
+
+        Response r = RestClient.insertBoxByID(input); // TODO fix rest call for insert
     }
 
     private static void get() throws IOException{
         System.out.println("Enter ID of the box");
         input = br.readLine();
 
-        try{
-            UUID uuid = UUID.fromString(input);
-            //do something
-        } catch (IllegalArgumentException exception){
-            System.out.println("Not valid UUID");
+        if (verifyID(input) == false){
+            System.out.println("Not valid id");
             return;
         }
 
-        Response r = RC.getBoxInfoByID(input);
+        Response r = RestClient.getBoxInfoByID(input);
 
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
@@ -55,12 +65,30 @@ public class ServiceEmulator {
         System.out.println("Enter ID of the box to retrieve");
         input = br.readLine();
 
-        Response r = RC.openBoxByID(input);
+        if (!verifyID(input)){
+            System.out.println("Not valid id");
+            return;
+        }
+
+        Response r = RestClient.openBoxByID(input);
+
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
+        }
+    }
+
+    private static boolean verifyID(String id){
+        try{
+            UUID uuid = UUID.fromString(input);
+            return true;
+        } catch (IllegalArgumentException exception){
+            return false;
+        }
     }
 
     public static void main(String[] args) throws IOException {
         br = new BufferedReader(new InputStreamReader(System.in));
-        RC = new RestClient();
 
         while (true){
             System.out.println("Enter command (get, open, insert)");
