@@ -5,8 +5,15 @@ import java.util.UUID;
 public class TestSQL {
     public static void main(String[] args) {
 
-        testOpen();
+        FindEmptySlot();
 
+    }
+
+    static void FindEmptySlot(){
+        FreezerStateHandler freezerStateHandler = new FreezerStateHandler();
+
+        int[] result = freezerStateHandler.FindEmptySlot();
+        System.out.println(result[0] + " " + result[1]);
     }
 
     static void GetBox(){
@@ -20,7 +27,7 @@ public class TestSQL {
     static void testOpen(){
         BoxHandler boxHandler = new BoxHandler();
 
-        int result = boxHandler.OpenBoxByID(UUID.fromString("A70D717E-935E-4CA2-8192-22E65D84BF71"));
+        int result = boxHandler.RetrieveBoxByID(UUID.fromString("A70D717E-935E-4CA2-8192-22E65D84BF71"));
 
         System.out.println(result);
     }

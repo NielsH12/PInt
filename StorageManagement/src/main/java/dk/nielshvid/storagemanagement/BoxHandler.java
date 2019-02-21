@@ -15,22 +15,14 @@ public class BoxHandler {
 
     public dbBox GetBoxInfoByID(UUID BoxID)  {
 
-        String Query = "SELECT Box.id" +
-        ", Persons.firstName" +
-        ", Persons.lastName" +
-        ", Persons.email" +
-        ", created" +
-        ", accessed" +
-        ", expiration" +
-        ", posX" +
-        ", posY " +
-        "FROM [ffu].[dbo].[Box] INNER JOIN [ffu].[dbo].[Persons] ON Box.owner = Persons.id WHERE Box.id =?";
+        String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration\n" +
+                "FROM [ffu].[dbo].[Box]\n" +
+                "LEFT OUTER JOIN [ffu].[dbo].[FreezerState] FS on Box.id = FS.boxID\n" +
+                "INNER JOIN [ffu].[dbo].[Persons] P on Box.owner = P.id\n" +
+                "WHERE Box.id = ?";
 
-        return SendBoxQuery(Query,BoxID);
-    }
 
-    private dbBox SendBoxQuery(String Query, UUID BoxID){
-        CheckDrivers(BoxID);
+        CheckDrivers();
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
             PreparedStatement stmt = con.prepareStatement(Query);
@@ -47,11 +39,6 @@ public class BoxHandler {
                 throw new EmptyStackException();
             }
 
-//            if (!rs.next() ) {
-//                System.out.println("fisk");
-//               return null;
-//            }
-
             dbBox result = new dbBox();
             while(rs.next()) {
                 result.id = rs.getString("id");
@@ -61,8 +48,8 @@ public class BoxHandler {
                 result.created = rs.getTimestamp("created");
                 result.accessed = rs.getTimestamp("accessed");
                 result.expiration = rs.getTimestamp("expiration");
-                result.posX = rs.getInt("posX");
-                result.posY = rs.getInt("posY");
+                result.posX = rs.getInt("x");
+                result.posY = rs.getInt("y");
             }
             return result;
         }
@@ -74,15 +61,19 @@ public class BoxHandler {
         }
     }
 
-    public int OpenBoxByID(UUID BoxID)  {
+    public int RetrieveBoxByID(UUID BoxID)  {
 
-        String Query = "UPDATE [ffu].[dbo].[Box] SET accessed = GETDATE(), posX = -1, posY = -1 WHERE Box.id =?";
+        String Query = "BEGIN TRY\n" +
+                "BEGIN TRANSACTION\n" +
+                "        UPDATE [ffu].[dbo].[FreezerState] SET boxID = null WHERE boxID =?\n" +
+                "        UPDATE [ffu].[dbo].[Box] SET accessed = GETDATE() WHERE id =?\n" +
+                "COMMIT\n" +
+                "END TRY\n" +
+                "BEGIN CATCH\n" +
+                "        ROLLBACK\n" +
+                "END CATCH";
 
-        return OpenBox(Query,BoxID);
-    }
-
-    private int OpenBox(String Query, UUID BoxID){
-        CheckDrivers(BoxID);
+        CheckDrivers();
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
             PreparedStatement stmt = con.prepareStatement(Query);
@@ -90,6 +81,7 @@ public class BoxHandler {
             String id = BoxID.toString();
 
             stmt.setString(1, id);
+            stmt.setString(2, id);
 
             return stmt.executeUpdate();
         }
@@ -101,8 +93,7 @@ public class BoxHandler {
         }
     }
 
-    private static void CheckDrivers(UUID BoxID) {
-        System.out.println("Sending box query for box: " + BoxID);
+    private static void CheckDrivers() {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             System.out.println("SQLServerDriver");

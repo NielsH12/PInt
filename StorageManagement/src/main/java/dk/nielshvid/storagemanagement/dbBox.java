@@ -10,6 +10,6 @@ public class dbBox {
     public Date created;
     public Date accessed;
     public Date expiration;
-    public int posX;
-    public int posY;
+    public Integer posX;
+    public Integer posY;
 }
