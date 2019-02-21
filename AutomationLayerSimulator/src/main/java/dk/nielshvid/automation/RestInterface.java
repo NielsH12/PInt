@@ -3,11 +3,9 @@ package dk.nielshvid.automation;
 import dk.nielshvid.storagemanagement.dbBox;
 import org.glassfish.jersey.server.mvc.Viewable;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +47,7 @@ public class RestInterface {
             return "success";
         };
 
-        return "failed";
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
 
     @Path("insert")
@@ -60,7 +58,7 @@ public class RestInterface {
             return "success";
         };
 
-        return "failed";
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
 
     @Path("close")
@@ -71,6 +69,6 @@ public class RestInterface {
             return "success";
         };
 
-        return "failed";
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
 }
