@@ -16,24 +16,22 @@ public class ServiceEmulator {
     private static Gson gs = new Gson();
 
     private static void insert() throws IOException{
-        String boxID ="";
-        String nameID ="";
+        String input ="";
 
         System.out.println("Enter ID of the box to insert");
-        boxID = br.readLine();
+        input = br.readLine();
 
-        if (!verifyID(boxID)){
+        if (!verifyID(input)){
             return;
         }
 
-        System.out.println("Enter ID of the person inserting the box");
-        nameID = br.readLine();
+        Response r = RestClient.insertBoxByID(input);
 
-        if (!verifyID(nameID)){
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
             return;
         }
-
-        Response r = RestClient.insertBoxByID(input); // TODO fix rest call for insert
     }
 
     private static void get() throws IOException{
@@ -75,6 +73,7 @@ public class ServiceEmulator {
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
             System.out.println(r.getStatusInfo().getReasonPhrase());
+            return;
         }
     }
 
