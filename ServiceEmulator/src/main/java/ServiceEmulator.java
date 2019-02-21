@@ -53,7 +53,11 @@ public class ServiceEmulator {
 
         try {
             dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
-            System.out.println(t.firstName);
+            System.out.println("First name: " + t.firstName);
+            System.out.println("Last name: " + t.lastName);
+            System.out.println("Email: " + t.email);
+            System.out.println("Created: " + t.created);
+            System.out.println("Expiration: " + t.expiration);
         } catch (Exception e){
             System.out.println("Response could not be converted to dbBox.class");
         }

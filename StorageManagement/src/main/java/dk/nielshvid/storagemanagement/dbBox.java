@@ -8,11 +8,11 @@ public class dbBox {
 
     String id;
     public String firstName;
-    String lastName;
-    String email;
-    Date created;
-    Date accessed;
-    Date expiration;
+    public String lastName;
+    public String email;
+    public Date created;
+    public Date accessed;
+    public Date expiration;
     int posX;
     int posY;
 }

@@ -45,7 +45,7 @@
 <script>
     $( document ).ready(function () {
         $('td').each (function() {
-           if($(this)[0].textContent === "Open"){
+           if($(this)[0].textContent === "Empty"){
                $(this).addClass("LightGrey")
            } else {
                $(this).addClass("Grey")
