@@ -15,7 +15,7 @@ public class BoxHandler {
 
     public dbBox GetBoxInfoByID(UUID BoxID)  {
 
-        String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration\n" +
+        String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration, FS.x, FS.y\n" +
                 "FROM [ffu].[dbo].[Box]\n" +
                 "LEFT OUTER JOIN [ffu].[dbo].[FreezerState] FS on Box.id = FS.boxID\n" +
                 "INNER JOIN [ffu].[dbo].[Persons] P on Box.owner = P.id\n" +
