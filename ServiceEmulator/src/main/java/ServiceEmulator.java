@@ -38,7 +38,7 @@ public class ServiceEmulator {
         System.out.println("Enter ID of the box");
         input = br.readLine();
 
-        if (verifyID(input) == false){
+        if (!verifyID(input)){
             System.out.println("Not valid id");
             return;
         }
@@ -73,7 +73,6 @@ public class ServiceEmulator {
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
             System.out.println(r.getStatusInfo().getReasonPhrase());
-            return;
         }
     }
 
