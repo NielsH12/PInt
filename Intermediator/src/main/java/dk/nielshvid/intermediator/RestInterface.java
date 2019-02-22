@@ -32,10 +32,10 @@ public class RestInterface {
         throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
 
-    @Path("open")
+    @Path("retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String open(@QueryParam("ID") UUID ID)  {
+    public String retrieve(@QueryParam("ID") UUID ID)  {
         if(ID == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }

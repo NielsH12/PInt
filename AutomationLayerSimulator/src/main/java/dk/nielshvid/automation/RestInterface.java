@@ -57,7 +57,7 @@ public class RestInterface {
     @Produces(MediaType.TEXT_PLAIN)
     public String retrieve(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
         if (FreezerHandler.updateByPos(x,y,null)){
-            return "success";
+            return "Success";
         }
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -68,7 +68,7 @@ public class RestInterface {
     @Produces(MediaType.TEXT_PLAIN)
     public String insert(@QueryParam("ID") String ID, @QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
         if (FreezerHandler.updateByPos(x,y,ID)){
-            return "success";
+            return "Success";
         }
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
