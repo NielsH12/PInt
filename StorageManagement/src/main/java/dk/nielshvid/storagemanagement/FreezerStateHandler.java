@@ -2,11 +2,41 @@ package dk.nielshvid.storagemanagement;
 
 import java.sql.*;
 import java.util.EmptyStackException;
+import java.util.UUID;
 
 public class FreezerStateHandler {
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
-    public int[] FindEmptySlot()  {
+    public static int InsertID(UUID id, int x, int y){
+        CheckDrivers();
+
+        String Query = "UPDATE [ffu].[dbo].FreezerState SET boxID=? WHERE x =? AND y =?";
+
+        try (Connection con = DriverManager.getConnection(connectionUrl)) {
+
+            PreparedStatement stmt = con.prepareStatement(Query);
+
+            stmt.setString(1,id.toString());
+            stmt.setInt(3, y);
+            stmt.setInt(2,x);
+
+            int rs = stmt.executeUpdate();
+
+            if (rs != 1){
+                System.out.println("Updated unexpected number of rows: " + rs);
+            }
+            return rs;
+        }
+        // Handle any errors that may have occurred.
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Got caught on second try-catch (SQL error)");
+            return -1;
+        }
+
+    }
+
+    public static int[] FindEmptySlot()  {
         CheckDrivers();
 
         String Query = "SELECT TOP(1) x,y FROM [ffu].[dbo].[FreezerState] WHERE boxID IS NULL";

@@ -71,7 +71,7 @@ public class RestInterface {
             throw new WebApplicationException(Response.status(204).entity("Box is already in Freezer").type("text/plain").build());
         }
 
-        int[] pos = new FreezerStateHandler().FindEmptySlot();
+        int[] pos = FreezerStateHandler.FindEmptySlot();
         if(pos == null || pos[0] == -1 || pos[1] == -1){
             throw new WebApplicationException(Response.status(218).entity("Freezer is full").type("text/plain").build());
         }
@@ -81,6 +81,9 @@ public class RestInterface {
         if(!response.equals("Success")){
             throw new WebApplicationException(Response.status(500).entity("Freezer had an error").type("text/plain").build());
         }
+
+        FreezerStateHandler.InsertID(ID, pos[0], pos[1]);
+
         return "Success";
     }
 }
