@@ -34,7 +34,7 @@ public class ServiceEmulator {
         }
     }
 
-    private static void get() throws IOException{
+    private static void retrieve() throws IOException{
         System.out.println("Enter ID of the box");
         input = br.readLine();
 
@@ -43,7 +43,7 @@ public class ServiceEmulator {
             return;
         }
 
-        Response r = RestClient.getBoxInfoByID(input);
+        Response r = RestClient.retrieveBoxByID(input);
 
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
@@ -63,7 +63,7 @@ public class ServiceEmulator {
         }
     }
 
-    private static void open() throws IOException{
+    private static void get() throws IOException{
         System.out.println("Enter ID of the box to retrieve");
         input = br.readLine();
 
@@ -72,7 +72,7 @@ public class ServiceEmulator {
             return;
         }
 
-        Response r = RestClient.openBoxByID(input);
+        Response r = RestClient.getBoxInfoByID(input);
 
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
@@ -93,16 +93,16 @@ public class ServiceEmulator {
         br = new BufferedReader(new InputStreamReader(System.in));
 
         while (true){
-            System.out.println("Enter command (get, open, insert)");
+            System.out.println("Enter command (retrieve, get, insert)");
             input = br.readLine();
 
             switch(input){
-                case "get":
-                    get();
+                case "retrieve":
+                    retrieve();
                     break;
 
-                case "open":
-                    open();
+                case "get":
+                    get();
                     break;
 
                 case "insert":

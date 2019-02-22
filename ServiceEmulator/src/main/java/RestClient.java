@@ -18,8 +18,8 @@ public class RestClient {
         return client.target(REST_URI + "get?ID=" + ID).request().get(); // GET
     }
 
-    public static Response openBoxByID(String ID){
-        return client.target(REST_URI + "open?ID=" + ID).request().get(); // OPEN
+    public static Response retrieveBoxByID(String ID){
+        return client.target(REST_URI + "retrieve?ID=" + ID).request().get(); // OPEN
     }
 
     public static Response insertBoxByID(String ID){
