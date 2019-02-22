@@ -16,12 +16,11 @@ public class ServiceEmulator {
     private static Gson gs = new Gson();
 
     private static void insert() throws IOException{
-        String input ="";
-
         System.out.println("Enter ID of the box to insert");
         input = br.readLine();
 
         if (!verifyID(input)){
+            System.out.println("Not valid id");
             return;
         }
 
@@ -51,16 +50,6 @@ public class ServiceEmulator {
             return;
         }
 
-        try {
-            dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
-            System.out.println("First name: " + t.firstName);
-            System.out.println("Last name: " + t.lastName);
-            System.out.println("Email: " + t.email);
-            System.out.println("Created: " + t.created);
-            System.out.println("Expiration: " + t.expiration);
-        } catch (Exception e){
-            System.out.println("Response could not be converted to dbBox.class");
-        }
     }
 
     private static void get() throws IOException{
@@ -77,6 +66,17 @@ public class ServiceEmulator {
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
             System.out.println(r.getStatusInfo().getReasonPhrase());
+        }
+
+        try {
+            dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
+            System.out.println("First name: " + t.firstName);
+            System.out.println("Last name: " + t.lastName);
+            System.out.println("Email: " + t.email);
+            System.out.println("Created: " + t.created);
+            System.out.println("Expiration: " + t.expiration);
+        } catch (Exception e){
+            System.out.println("Response could not be converted to dbBox.class");
         }
     }
 

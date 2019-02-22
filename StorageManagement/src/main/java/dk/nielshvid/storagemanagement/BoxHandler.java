@@ -48,8 +48,8 @@ public class BoxHandler {
                 result.created = rs.getTimestamp("created");
                 result.accessed = rs.getTimestamp("accessed");
                 result.expiration = rs.getTimestamp("expiration");
-                result.posX = rs.getInt("x");
-                result.posY = rs.getInt("y");
+                result.posX = (Integer) rs.getObject("x");
+                result.posY = (Integer) rs.getObject("y");
             }
             return result;
         }

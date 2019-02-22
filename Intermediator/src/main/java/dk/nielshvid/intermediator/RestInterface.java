@@ -24,8 +24,10 @@ public class RestInterface {
     public String get(@QueryParam("ID") UUID ID)  {
         if(ID != null) {
             String result = Intermediator.lookup(ID);
-            if(result != null)
+            if(result != null){
                 return result;
+            }
+
 
             throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
