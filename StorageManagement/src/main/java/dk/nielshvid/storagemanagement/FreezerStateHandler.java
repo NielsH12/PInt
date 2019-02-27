@@ -36,6 +36,7 @@ public class FreezerStateHandler {
 
     }
 
+
     public static int[] FindEmptySlot()  {
         CheckDrivers();
 

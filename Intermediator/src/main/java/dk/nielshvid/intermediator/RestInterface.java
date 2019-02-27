@@ -5,12 +5,17 @@ import dk.nielshvid.storagemanagement.FreezerStateHandler;
 import dk.nielshvid.storagemanagement.dbBox;
 
 import javax.ws.rs.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 @Path("/")
 public class RestInterface {
+    private static final String REST_URI = "http://localhost:8081/";
+    private static Client client = ClientBuilder.newClient();
+
     @Path("hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -85,5 +90,57 @@ public class RestInterface {
         FreezerStateHandler.InsertID(ID, pos[0], pos[1]);
 
         return "Success";
+    }
+
+    @Path("getBoxPosition")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getBoxPosition(@QueryParam("ID") UUID ID)  {
+        if(ID == null) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
+        String result = IntermediatorClient.getBoxPosition(ID);
+
+        return result;
+    }
+
+    @Path("getBoxInfoByID")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getBoxInfoByID(@QueryParam("ID") UUID ID, @QueryParam("UserID") UUID UserID)  {
+        if(ID == null || UserID == null) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
+//      ACCESSCHECK
+        if(!AccessHandler.CheckAccess(UserID, "Box", "get")){
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+
+        return IntermediatorClient.getBoxInfoByID(ID);
+    }
+
+    @Path("findEmptySlot")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String findEmptySlot(@QueryParam("ID") UUID ID)  {
+
+       return IntermediatorClient.findEmptySlot();
+    }
+
+    @Path("insertBox")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String insertBox(@QueryParam("ID") UUID ID, @QueryParam("posX") int x, @QueryParam("posY") int y)  {
+        return IntermediatorClient.InsertBox(ID, x, y);
+    }
+
+
+    @Path("insertAuto")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String insertAuto(@QueryParam("ID") UUID ID, @QueryParam("posX") int x, @QueryParam("posY") int y)  {
+        return IntermediatorClient.InsertBoxAuto(ID, x, y);
     }
 }

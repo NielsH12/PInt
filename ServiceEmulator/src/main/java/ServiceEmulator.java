@@ -13,7 +13,7 @@ public class ServiceEmulator {
 
     private static BufferedReader br;
     private static String input;
-    private static Gson gs = new Gson();
+    private static Gson gson = new Gson();
 
     private static void insert() throws IOException{
         System.out.println("Enter ID of the box to insert");
@@ -24,13 +24,9 @@ public class ServiceEmulator {
             return;
         }
 
-        Response r = RestClient.insertBoxByID(input);
+        String r = RestClient.insertBoxByIDv2(input);
 
-        if(r.getStatus() != 200){
-            System.out.println(r.getStatus());
-            System.out.println(r.getStatusInfo().getReasonPhrase());
-            return;
-        }
+        System.out.println(r);
     }
 
     private static void retrieve() throws IOException{
@@ -61,23 +57,59 @@ public class ServiceEmulator {
             return;
         }
 
-        Response r = RestClient.getBoxInfoByID(input);
+        Response r = RestClient.retrieveBoxByID(input);
 
         if(r.getStatus() != 200){
             System.out.println(r.getStatus());
             System.out.println(r.getStatusInfo().getReasonPhrase());
+            return;
         }
 
-        try {
-            dbBox t = gs.fromJson(r.readEntity(String.class), dbBox.class);
-            System.out.println("First name: " + t.firstName);
-            System.out.println("Last name: " + t.lastName);
-            System.out.println("Email: " + t.email);
-            System.out.println("Created: " + t.created);
-            System.out.println("Expiration: " + t.expiration);
-        } catch (Exception e){
-            System.out.println("Response could not be converted to dbBox.class");
+        dbBox t = gson.fromJson(r.readEntity(String.class), dbBox.class);
+
+        System.out.println("First name: " + t.firstName);
+        System.out.println("Last name: " + t.lastName);
+        System.out.println("Email: " + t.email);
+        System.out.println("Created: " + t.created);
+        System.out.println("Expiration: " + t.expiration);
+
+    }
+
+
+    private static void getBoxInfoByID() throws IOException{
+        System.out.println("Enter ID of the box");
+        input = br.readLine();
+        System.out.println(input);
+
+        if (!verifyID(input)){
+            System.out.println("Not valid id");
+            return;
         }
+
+        System.out.println("Enter Your user ID");
+        String UserID = br.readLine();
+        System.out.println(UserID);
+
+        if (!verifyID(UserID)){
+            System.out.println("Not valid id");
+            return;
+        }
+
+        Response r = RestClient.getBoxInfoByIDv2(input, UUID.fromString(UserID));
+
+        if(r.getStatus() != 200){
+            System.out.println(r.getStatus());
+            System.out.println(r.getStatusInfo().getReasonPhrase());
+            return;
+        }
+
+        dbBox t = gson.fromJson(r.readEntity(String.class), dbBox.class);
+
+        System.out.println("First name: " + t.firstName);
+        System.out.println("Last name: " + t.lastName);
+        System.out.println("Email: " + t.email);
+        System.out.println("Created: " + t.created);
+        System.out.println("Expiration: " + t.expiration);
     }
 
     private static boolean verifyID(String id){
@@ -102,7 +134,7 @@ public class ServiceEmulator {
                     break;
 
                 case "get":
-                    get();
+                    getBoxInfoByID();
                     break;
 
                 case "insert":

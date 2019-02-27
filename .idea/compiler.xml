@@ -15,7 +15,7 @@
     <bytecodeTargetLevel>
       <module name="AutomationLayerSimulator" target="1.8" />
       <module name="FFUBACKEND" target="1.8" />
-      <module name="Intermediator" target="1.5" />
+      <module name="Intermediator" target="8" />
       <module name="ServiceEmulator" target="1.8" />
       <module name="StorageManagement" target="1.8" />
     </bytecodeTargetLevel>
