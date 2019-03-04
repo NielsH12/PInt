@@ -1,8 +1,5 @@
 package dk.nielshvid.intermediator;
 
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.sql.*;
 import java.util.EmptyStackException;
 import java.util.UUID;
@@ -12,8 +9,9 @@ public class AccessHandler {
 
 
 
-    public static Boolean CheckAccess(UUID userUUID, String resource, String Action) {
+    public static Boolean CheckAccess(String _userUUID, String resource, String Action) {
 
+        UUID userUUID = UUID.fromString(_userUUID);
 
         String role = GetRole(userUUID);
         if(role.equals("")){

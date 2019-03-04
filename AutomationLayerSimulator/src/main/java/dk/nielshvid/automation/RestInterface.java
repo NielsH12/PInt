@@ -1,13 +1,12 @@
 package dk.nielshvid.automation;
 
-import dk.nielshvid.storagemanagement.dbBox;
+
 import org.glassfish.jersey.server.mvc.Viewable;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Path("/")
@@ -39,19 +38,6 @@ public class RestInterface {
         return new Viewable("/index", model);
     }
 
-    /*
-    @Path("open")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String open(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
-        if (FreezerHandler.updateByPos(x,y,null, false)){
-            return "success";
-        }
-
-        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-    */
-
     @Path("retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -73,17 +59,4 @@ public class RestInterface {
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
-
-    /*
-    @Path("close")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String close(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
-        if (FreezerHandler.updateByPos(x,y,null, true)){
-            return "success";
-        }
-
-        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-    */
 }

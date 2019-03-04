@@ -1,7 +1,3 @@
-import com.google.gson.Gson;
-import dk.nielshvid.storagemanagement.dbBox;
-
-import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,7 +9,6 @@ public class ServiceEmulator {
 
     private static BufferedReader br;
     private static String input;
-    private static Gson gson = new Gson();
 
     private static void insert() throws IOException{
         System.out.println("Enter ID of the box to insert");
@@ -24,7 +19,17 @@ public class ServiceEmulator {
             return;
         }
 
-        String r = RestClient.insertBoxByIDv2(input);
+        System.out.println("Enter Your user ID");
+        String UserID = br.readLine();
+        System.out.println(UserID);
+
+        if (!verifyID(UserID)){
+            System.out.println("Not valid id");
+            return;
+        }
+
+
+        String r = RestClient.insertBoxByID(input, UserID);
 
         System.out.println(r);
     }
@@ -38,42 +43,46 @@ public class ServiceEmulator {
             return;
         }
 
-        Response r = RestClient.retrieveBoxByID(input);
+        System.out.println("Enter Your user ID");
+        String UserID = br.readLine();
+        System.out.println(UserID);
 
-        if(r.getStatus() != 200){
-            System.out.println(r.getStatus());
-            System.out.println(r.getStatusInfo().getReasonPhrase());
-            return;
-        }
-
-    }
-
-    private static void get() throws IOException{
-        System.out.println("Enter ID of the box to retrieve");
-        input = br.readLine();
-
-        if (!verifyID(input)){
+        if (!verifyID(UserID)){
             System.out.println("Not valid id");
             return;
         }
 
-        Response r = RestClient.retrieveBoxByID(input);
+        String result = RestClient.retrieveBoxByID(input, UserID);
 
-        if(r.getStatus() != 200){
-            System.out.println(r.getStatus());
-            System.out.println(r.getStatusInfo().getReasonPhrase());
-            return;
-        }
-
-        dbBox t = gson.fromJson(r.readEntity(String.class), dbBox.class);
-
-        System.out.println("First name: " + t.firstName);
-        System.out.println("Last name: " + t.lastName);
-        System.out.println("Email: " + t.email);
-        System.out.println("Created: " + t.created);
-        System.out.println("Expiration: " + t.expiration);
-
+        System.out.println(result);
     }
+
+//    private static void get() throws IOException{
+//        System.out.println("Enter ID of the box to retrieve");
+//        input = br.readLine();
+//
+//        if (!verifyID(input)){
+//            System.out.println("Not valid id");
+//            return;
+//        }
+//
+//        Response r = RestClient.retrieveBoxByID(input);
+//
+//        if(r.getStatus() != 200){
+//            System.out.println(r.getStatus());
+//            System.out.println(r.getStatusInfo().getReasonPhrase());
+//            return;
+//        }
+//
+//        dbBox t = gson.fromJson(r.readEntity(String.class), dbBox.class);
+//
+//        System.out.println("First name: " + t.firstName);
+//        System.out.println("Last name: " + t.lastName);
+//        System.out.println("Email: " + t.email);
+//        System.out.println("Created: " + t.created);
+//        System.out.println("Expiration: " + t.expiration);
+//
+//    }
 
 
     private static void getBoxInfoByID() throws IOException{
@@ -95,21 +104,8 @@ public class ServiceEmulator {
             return;
         }
 
-        Response r = RestClient.getBoxInfoByIDv2(input, UUID.fromString(UserID));
-
-        if(r.getStatus() != 200){
-            System.out.println(r.getStatus());
-            System.out.println(r.getStatusInfo().getReasonPhrase());
-            return;
-        }
-
-        dbBox t = gson.fromJson(r.readEntity(String.class), dbBox.class);
-
-        System.out.println("First name: " + t.firstName);
-        System.out.println("Last name: " + t.lastName);
-        System.out.println("Email: " + t.email);
-        System.out.println("Created: " + t.created);
-        System.out.println("Expiration: " + t.expiration);
+        String r = RestClient.getBoxInfoByID(input, UserID);
+        System.out.println(r);
     }
 
     private static boolean verifyID(String id){
