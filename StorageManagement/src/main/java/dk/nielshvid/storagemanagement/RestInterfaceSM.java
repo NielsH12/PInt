@@ -58,7 +58,7 @@ public class RestInterfaceSM {
 
     @Path("retrieve")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public String retrieve(@QueryParam("ID") UUID ID)  {
         if(ID == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
