@@ -1,9 +1,5 @@
 package dk.nielshvid.intermediator;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.json.JSONObject;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
