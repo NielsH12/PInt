@@ -19,8 +19,12 @@ public class RestClient {
         return client.target(REST_URI_Intermediator).request(MediaType.TEXT_PLAIN).get();
     }
 
-    public static String getBoxInfoByID(String BoxID, String UserID){
-        Response response = sendGetBoxInfoByIDv2(BoxID, UserID);
+    public static String getBoxInfoByID(String UserID, String BoxID){
+        Response response = sendGetBoxInfoByIDv2(UserID, BoxID);
+
+        String fisk = response.getHeaderString("cap");
+
+        System.out.println(fisk);
 
         if(response.getStatus() != 200){
             throw new WebApplicationException(response.getStatus());
@@ -35,6 +39,10 @@ public class RestClient {
 
     public static String retrieveBoxByID(String BoxID, String UserID){
         Response response = sendGetBoxInfoByIDv2(BoxID, UserID); // GET
+
+        String fisk = response.getHeaderString("cap");
+
+        System.out.println(fisk);
 
         if(response.getStatus() != 200){
             return "Box is not in system" + response.getStatus();
@@ -115,8 +123,8 @@ public class RestClient {
         return client.target(REST_URI_Intermediator + "Freezer/retrieve?ID=" + BoxID + "&UserID=" + userID).request().get();
     }
 
-    private static Response sendGetBoxInfoByIDv2(String BoxID, String userID){
-        return client.target(REST_URI_Intermediator + "BoxDB/get?ID=" + BoxID + "&UserID=" + userID).request().get();
+    private static Response sendGetBoxInfoByIDv2(String userID, String BoxID){
+        return client.target(REST_URI_Intermediator + "BoxDB/get?UserID=" + userID + "&BoxID=" + BoxID).request().get();
     }
 
     private static Response sendFindEmptySlot(String userID){

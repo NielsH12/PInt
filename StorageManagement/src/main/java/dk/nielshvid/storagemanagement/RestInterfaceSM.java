@@ -42,7 +42,7 @@ public class RestInterfaceSM {
     @Path("get")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@QueryParam("ID") UUID ID)  {
+    public String get(@QueryParam("ID") String ID)  {
         if(ID == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
@@ -59,7 +59,7 @@ public class RestInterfaceSM {
     @Path("retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String retrieve(@QueryParam("ID") UUID ID)  {
+    public String retrieve(@QueryParam("ID") String ID)  {
         if(ID == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }

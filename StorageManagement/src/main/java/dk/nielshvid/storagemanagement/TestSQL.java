@@ -1,11 +1,11 @@
 package dk.nielshvid.storagemanagement;
 
-import java.util.UUID;
-
 public class TestSQL {
     public static void main(String[] args) {
 
         FindEmptySlot();
+        GetBox();
+//        testOpen();
 
     }
 
@@ -19,7 +19,7 @@ public class TestSQL {
     static void GetBox(){
         BoxHandler boxHandler = new BoxHandler();
 
-        dbBox result = boxHandler.GetBoxInfoByID(UUID.fromString("A70D717E-935E-4CA2-8192-22E65D84BF71"));
+        dbBox result = boxHandler.GetBoxInfoByID("A70D717E-935E-4CA2-8192-22E65D84BF71@1E3C9DBF-C004-4F93-B3BB-D1E45945D482");
 
         System.out.println(result.created);
     }
@@ -27,7 +27,7 @@ public class TestSQL {
     static void testOpen(){
         BoxHandler boxHandler = new BoxHandler();
 
-        int result = boxHandler.RetrieveBoxByID(UUID.fromString("A70D717E-935E-4CA2-8192-22E65D84BF71"));
+        int result = boxHandler.RetrieveBoxByID("A70D717E-935E-4CA2-8192-22E65D84BF711E3C9DBF-C004-4F93-B3BB-D1E45945D482");
 
         System.out.println(result);
     }

@@ -1,8 +1,7 @@
 package dk.nielshvid.intermediator;
 
 import java.sql.*;
-import java.util.EmptyStackException;
-import java.util.UUID;
+import java.util.*;
 
 public class AccessHandler {
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
@@ -11,22 +10,14 @@ public class AccessHandler {
 
     public static Boolean CheckAccess(String _userUUID, String resource, String Action) {
 
-        UUID userUUID = UUID.fromString(_userUUID);
-
-        String role = GetRole(userUUID);
-        if(role.equals("")){
-            return false;
-        }
-
-        if(resource.equals("") || Action.equals("")){
-            System.out.println("empty input argument");
-            return false;
-        }
-
-        String Query = "SELECT COUNT(ID) AS total " +
-                "FROM [ffu].[dbo].[Policies] " +
-                "WHERE Role = ? AND Resource = ? AND Actions = ?";
-
+        // language=SQL
+        String Query = "SELECT * From\n" +
+                "(SELECT * FROM Policies WHERE Resource = ? AND Actions = ?) as P\n" +
+                "  INNER JOIN PersonsHaveRole PHR\n" +
+                "             ON PHR.RoleId = P.RoleId_P\n" +
+                "  INNER JOIN Roles R\n" +
+                "             ON PHR.roleId = R.id\n" +
+                "WHERE PHR.personId = ?";
 
         CheckDrivers();
 
@@ -35,9 +26,9 @@ public class AccessHandler {
             PreparedStatement stmt = con.prepareStatement(Query);
 
 
-            stmt.setString(1, role);
-            stmt.setString(2, resource);
-            stmt.setString(3, Action);
+            stmt.setString(1, resource);
+            stmt.setString(2, Action);
+            stmt.setString(3, _userUUID);
 
             ResultSet rs = stmt.executeQuery();
 
@@ -60,42 +51,55 @@ public class AccessHandler {
         }
     }
 
-    private static String GetRole(UUID userID) {
+//    private static  List<String> GetRole(UUID userID) {
+//
+//        String Query2 = "SELECT role\n" +
+//                "FROM [ffu].[dbo].[Persons]\n" +
+//                "WHERE id = ?";
+//
+//        // language=SQL
+//        String Query = "SELECT Roles.id\n" +
+//                "FROM Persons \n" +
+//                "       INNER JOIN PersonsHaveRole PHR\n" +
+//                "         ON Persons.id = PHR.personId\n" +
+//                "       INNER JOIN Roles\n" +
+//                "         ON PHR.roleId = Roles.id \n" +
+//                "WHERE role = ? AND organization = ?";
+//
+//        CheckDrivers();
+//
+//        try (Connection con = DriverManager.getConnection(connectionUrl)) {
+//
+//            PreparedStatement stmt = con.prepareStatement(Query);
+//
+//
+//            stmt.setString(1, userID.toString().toUpperCase());
+//
+//            ResultSet rs = stmt.executeQuery();
+//
+//            // Iterate through the data in the result set and display it.
+//            if (rs == null){
+//                System.out.println("rs was null");
+//                throw new EmptyStackException();
+//            }
+//
+//            List<String[]> Roles = new ArrayList<>();
+//            while(rs.next()) {
+//                String[] fisk = new String[2];
+//                fisk[0] = rs.getString("role");
+//                fisk[1] = rs.getString("id");
+//                Roles.add(fisk);
+//            }
+//
+//            return Roles;
+//        }
+//        catch (SQLException e) {
+//            e.printStackTrace();
+//            System.out.println("Got caught on second try-catch (SQL error)");
+//            return  Collections.emptyList();
+//        }
+//    }
 
-        String Query = "SELECT role\n" +
-                "FROM [ffu].[dbo].[Persons]\n" +
-                "WHERE id = ?";
-
-
-        CheckDrivers();
-
-        try (Connection con = DriverManager.getConnection(connectionUrl)) {
-
-            PreparedStatement stmt = con.prepareStatement(Query);
-
-
-            stmt.setString(1, userID.toString().toUpperCase());
-
-            ResultSet rs = stmt.executeQuery();
-
-            // Iterate through the data in the result set and display it.
-            if (rs == null){
-                System.out.println("rs was null");
-                throw new EmptyStackException();
-            }
-
-            while(rs.next()) {
-                return rs.getString("role");
-            }
-
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Got caught on second try-catch (SQL error)");
-            return "";
-        }
-        return "";
-    }
     private static void CheckDrivers() {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

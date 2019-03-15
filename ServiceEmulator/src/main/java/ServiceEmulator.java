@@ -14,7 +14,7 @@ public class ServiceEmulator {
         System.out.println("Enter ID of the box to insert");
         input = br.readLine();
 
-        if (!verifyID(input)){
+        if (!verifyBoxID(input)){
             System.out.println("Not valid id");
             return;
         }
@@ -38,7 +38,7 @@ public class ServiceEmulator {
         System.out.println("Enter ID of the box");
         input = br.readLine();
 
-        if (!verifyID(input)){
+        if (!verifyBoxID(input)){
             System.out.println("Not valid id");
             return;
         }
@@ -87,10 +87,10 @@ public class ServiceEmulator {
 
     private static void getBoxInfoByID() throws IOException{
         System.out.println("Enter ID of the box");
-        input = br.readLine();
-        System.out.println(input);
+        String Boxid = br.readLine();
+        System.out.println(Boxid);
 
-        if (!verifyID(input)){
+        if (!verifyBoxID(Boxid)){
             System.out.println("Not valid id");
             return;
         }
@@ -104,13 +104,18 @@ public class ServiceEmulator {
             return;
         }
 
-        String r = RestClient.getBoxInfoByID(input, UserID);
+        String r = RestClient.getBoxInfoByID(UserID, Boxid);
         System.out.println(r);
+    }
+
+    private static boolean verifyBoxID(String id){
+        System.out.println("verifyBoxID" + id.length());
+        return id.length() == 73;
     }
 
     private static boolean verifyID(String id){
         try{
-            UUID uuid = UUID.fromString(input);
+            UUID uuid = UUID.fromString(id);
             return true;
         } catch (IllegalArgumentException exception){
             return false;

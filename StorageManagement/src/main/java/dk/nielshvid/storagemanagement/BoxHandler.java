@@ -13,13 +13,16 @@ public class BoxHandler {
 
     }
 
-    public dbBox GetBoxInfoByID(UUID BoxID)  {
+    public dbBox GetBoxInfoByID(String BoxID)  {
 
-        String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration, FS.x, FS.y\n" +
+        String _BoxID = BoxID.substring(0,36);
+        String _OrgID = BoxID.substring(37);
+
+        String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration, FS.x, FS.y, Box.organizationID\n" +
                 "FROM [ffu].[dbo].[Box]\n" +
                 "LEFT OUTER JOIN [ffu].[dbo].[FreezerState] FS on Box.id = FS.boxID\n" +
                 "INNER JOIN [ffu].[dbo].[Persons] P on Box.owner = P.id\n" +
-                "WHERE Box.id = ?";
+                "WHERE Box.id = ? AND Box.organizationID = ?";
 
 
         CheckDrivers();
@@ -29,7 +32,8 @@ public class BoxHandler {
 
             System.out.println(BoxID.toString());
 
-            stmt.setString(1, BoxID.toString().toUpperCase());
+            stmt.setString(1, _BoxID);
+            stmt.setString(2, _OrgID);
 
             ResultSet rs = stmt.executeQuery();
 
@@ -41,7 +45,7 @@ public class BoxHandler {
 
             dbBox result = new dbBox();
             while(rs.next()) {
-                result.id = rs.getString("id");
+                result.id = rs.getString("id")+ "@" +rs.getString("organizationID");
                 result.firstName = rs.getString("firstName");
                 result.lastName = rs.getString("lastName");
                 result.email = rs.getString("email");
@@ -61,7 +65,9 @@ public class BoxHandler {
         }
     }
 
-    public int RetrieveBoxByID(UUID BoxID)  {
+    public int RetrieveBoxByID(String BoxID)  {
+
+        String _BoxID = BoxID.substring(0,36);
 
         String Query = "BEGIN TRY\n" +
                 "BEGIN TRANSACTION\n" +
@@ -80,8 +86,8 @@ public class BoxHandler {
 
             String id = BoxID.toString();
 
-            stmt.setString(1, id);
-            stmt.setString(2, id);
+            stmt.setString(1, _BoxID);
+            stmt.setString(2, _BoxID);
 
             return stmt.executeUpdate();
         }
