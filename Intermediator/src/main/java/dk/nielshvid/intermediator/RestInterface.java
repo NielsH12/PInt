@@ -3,6 +3,7 @@ package dk.nielshvid.intermediator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -44,6 +45,7 @@ public class RestInterface{
     public Response retrieveFreezer (@QueryParam("UserID") String UserID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
         // capability
+
 
         // Forward request
         return IntermediatorClient.retrieveFreezer(UserID, xPos, yPos);

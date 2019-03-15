@@ -108,6 +108,13 @@ public class ServiceEmulator {
         System.out.println(r);
     }
 
+    private static void jensGet(){
+        String UserID = "B6F64D8F-1916-4236-9BBA-039A380329AD";
+        String Boxid = "A70D717E-935E-4CA2-8192-22E65D84BF71@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
+        String r = RestClient.getBoxInfoByID(UserID, Boxid);
+        System.out.println(r);
+    }
+
     private static boolean verifyBoxID(String id){
         System.out.println("verifyBoxID" + id.length());
         return id.length() == 73;
@@ -140,6 +147,10 @@ public class ServiceEmulator {
 
                 case "insert":
                     insert();
+                    break;
+
+                case "jensget":
+                    jensGet();
                     break;
 
                 default:
