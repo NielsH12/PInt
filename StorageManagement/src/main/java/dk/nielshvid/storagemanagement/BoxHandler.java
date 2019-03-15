@@ -84,8 +84,6 @@ public class BoxHandler {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            String id = BoxID.toString();
-
             stmt.setString(1, _BoxID);
             stmt.setString(2, _BoxID);
 
