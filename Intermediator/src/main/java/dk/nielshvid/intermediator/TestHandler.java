@@ -1,5 +1,6 @@
 package dk.nielshvid.intermediator;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class TestHandler {
@@ -8,16 +9,24 @@ public class TestHandler {
 
         CapabilityHandler capabilityHandler = new CapabilityHandler();
 
-        capabilityHandler.test();
 
-        try {
-            Thread.sleep(6000);
-        }
-        catch (InterruptedException e){
-            System.out.println(e);
-        }
 
-        capabilityHandler.test();
+
+//        capTree.put("get", new CapabilityHandler.Node<String>());
+
+        UUID test = UUID.randomUUID();
+
+        UUID capID = capabilityHandler.addCapability(test, "get");
+
+        System.out.println(capabilityHandler.useAction(test, capID,"retrieve"));
+
+        System.out.println(capabilityHandler.useAction(test, capID,"move"));
+
+        System.out.println(capabilityHandler.useAction(test, capID,"testCase"));
+
+
+
+
 
 
 //        UUID Jens = UUID.fromString("B6F64D8F-1916-4236-9BBA-039A380329AD");
