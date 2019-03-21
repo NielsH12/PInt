@@ -33,8 +33,8 @@ public class RestInterfaceSM {
     @Path("insert")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String insert(@QueryParam("ID") UUID id, @QueryParam("xPos") int x,@QueryParam("yPos") int y)  {
-        int result = FreezerStateHandler.InsertID(id, x, y);
+    public String insert(@QueryParam("BoxID") String BoxID, @QueryParam("xPos") int x,@QueryParam("yPos") int y)  {
+        int result = FreezerStateHandler.InsertID(BoxID, x, y);
 
         return Integer.toString(result);
     }
@@ -42,12 +42,12 @@ public class RestInterfaceSM {
     @Path("get")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@QueryParam("ID") String ID)  {
-        if(ID == null) {
+    public String get(@QueryParam("BoxID") String BoxID)  {
+        if(BoxID == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        dbBox result = new BoxHandler().GetBoxInfoByID(ID);
+        dbBox result = new BoxHandler().GetBoxInfoByID(BoxID);
 
         if(result.id == null){
             throw new WebApplicationException(Response.status(204).entity("Box do not exist").type("text/plain").build());
@@ -59,12 +59,12 @@ public class RestInterfaceSM {
     @Path("retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String retrieve(@QueryParam("ID") String ID)  {
-        if(ID == null) {
+    public String retrieve(@QueryParam("BoxID") String BoxID)  {
+        if(BoxID == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        int result = new BoxHandler().RetrieveBoxByID(ID);
+        int result = new BoxHandler().RetrieveBoxByID(BoxID);
 
         if(result == 0){
             throw new WebApplicationException(Response.status(204).entity("Box do not exist").type("text/plain").build());

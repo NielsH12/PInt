@@ -10,7 +10,12 @@ public class FreezerHandler {
 
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
-    public static boolean updateByPos(int x, int y, String id){
+
+    public static boolean updateByPos(int x, int y, String BoxID){
+        String _BoxID = null;
+        if(BoxID != null){
+            _BoxID = BoxID.substring(0,36);
+        }
 
         String Query = "UPDATE [ffu].[dbo].[Freezer] SET boxID = ? WHERE Freezer.x = ? AND Freezer.y = ?";
 
@@ -23,7 +28,7 @@ public class FreezerHandler {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            stmt.setString(1, id);
+            stmt.setString(1, _BoxID);
             stmt.setInt(2, x);
             stmt.setInt(3, y);
 

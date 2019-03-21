@@ -4,10 +4,18 @@ import java.sql.*;
 import java.util.EmptyStackException;
 import java.util.UUID;
 
-public class IdentityService {
+public class IdentityService implements IdentityServiceInterface{
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
-    public String getRole(UUID UserID, UUID OrgID){
+    public String getRole(UUID UserID, String BoxID){
+        UUID OrgID;
+        try {
+            OrgID = UUID.fromString(BoxID.substring(37));
+        }
+        catch (Exception e){
+            return null;
+        }
+
 
         String roleResult = findRole(UserID, OrgID);
 
@@ -21,7 +29,7 @@ public class IdentityService {
             return null;
         }
 
-        return getRole(UserID, UUID.fromString(parrentOrgResult));
+        return getRole(UserID, parrentOrgResult);
     }
 
     private String findParrentOrg(UUID OrgID)  {

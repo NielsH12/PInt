@@ -1,26 +1,29 @@
 package dk.nielshvid.intermediator;
-
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class CapabilityHandler {
     private static HashMap<UUID, Capability> capabilities = new HashMap<>();
-    private LocalTime lastClean = LocalTime.now();
+    private static LocalTime lastClean = LocalTime.now();
     private HashMap<String, Node<String>> treeTemplates = new HashMap<String, Node<String>>(){{
-        put("get", new Node<String>("get"){{
-            addChild(new Node<String>("retrieve"){{
-                addChild(new Node<>("testCase"));
+
+        put("BoxDB/get", new Node<String>("BoxDB/get"){{
+            addChild(new Node<String>("Freezer/retrieve"){{
+                addChild(new Node<String>("BoxDB/retrieve"){{
+                }});
             }});
-            addChild(new Node<>("move"));
         }});
+        put("BoxDB/findEmptySlot", new Node<String>("BoxDB/findEmptySlot"){{
+            addChild(new Node<String>("Freezer/insert"){{
+                addChild(new Node<String>("BoxDB/insert"){{
+                }});
+            }});
+        }});
+
     }};
 
 
-
-    public UUID addCapability(UUID userID, String key){
+    public UUID addCapability(UUID userID, String boxID, String key){
 
         if(!treeTemplates.containsKey(key)){
             return null;
@@ -28,21 +31,27 @@ public class CapabilityHandler {
 
         Node<String> treeTemplate = treeTemplates.get(key);
 
-        Capability capability = new Capability(userID, treeTemplate);
-        capabilities.put(capability.getID(),capability);
+        Capability capability = new Capability(userID, boxID, treeTemplate);
+        capabilities.put(capability.getID(), capability);
         return capability.ID;
     }
 
-    public boolean useAction(UUID UserID, UUID CapabilityID, String action){
+    boolean authorize(UUID UserID, String boxID, UUID CapabilityID, String action){
+        System.out.println("CapabilityHandler.authorize()");
+
         if(lastClean.plusHours(24).isBefore(LocalTime.now())){
+            System.out.println("\t More than 24 hours since last clean");
             cleanCapabilities();
         }
 
         if(!capabilities.containsKey(CapabilityID)){
-           return false;
+            System.out.println("\t Capability key is not recognized");
+            return false;
         }
 
-        boolean result =  capabilities.get(CapabilityID).useAction(UserID, action);
+        boolean result =  capabilities.get(CapabilityID).useAction(UserID, boxID, action);
+        System.out.println("\t Trying to perform action: " + " " + action + ": " + result);
+
         if(capabilities.get(CapabilityID).delete()){
             capabilities.remove(CapabilityID);
         }
@@ -51,7 +60,10 @@ public class CapabilityHandler {
 
     private void cleanCapabilities(){
         lastClean = LocalTime.now();
-        for (UUID i : capabilities.keySet()){
+
+        ArrayList<UUID> test = new ArrayList<>(capabilities.keySet());
+
+        for (UUID i : test){
             if (capabilities.get(i).delete()){
                 capabilities.remove(i);
             }
@@ -59,50 +71,48 @@ public class CapabilityHandler {
     }
 
 
-    public class Capability {
+    private class Capability {
         private LocalTime lastUsed;
-//        private ArrayList<String> Actions;
         private Node<String> Actions;
         private UUID ID;
         private UUID userID;
+        private String boxID;
 
-        Capability(UUID userID,  Node<String> Actions){
+        Capability(UUID userID,  String boxID, Node<String> Actions){
             this.userID = userID;
             this.Actions = Actions;
+            this.boxID = boxID;
 
             ID = UUID.randomUUID();
             lastUsed = LocalTime.now();
         }
 
-        public UUID getID() {
+        UUID getID() {
             return ID;
         }
 
         boolean delete(){
             LocalTime temp = LocalTime.now();
-            if(!temp.isBefore(lastUsed.plusSeconds(5))){
+            if(!temp.isBefore(lastUsed.plusSeconds(300))){ // debug value
                 return true;
             }
             return false;
         }
 
-        boolean useAction(UUID UserID, String action){
+        boolean useAction(UUID UserID, String boxID, String action){
             LocalTime temp = LocalTime.now();
 
             if(!UserID.equals(this.userID)){
                 return false;
             }
 
-            if(!temp.isBefore(lastUsed.plusSeconds(5))){
+            if(!boxID.equals(this.boxID)){
                 return false;
             }
 
-//            if (Actions.get(0).equals(action)) {
-//                lastUsed = LocalTime.now();
-//
-//                Actions.remove(0);
-//                return true;
-//            }
+            if(!temp.isBefore(lastUsed.plusSeconds(300))){ // debug value
+                return false;
+            }
 
             Node<String> t = this.Actions.useAction(action);
             if (t != null){
@@ -113,37 +123,21 @@ public class CapabilityHandler {
         }
     }
 
-    public class Node<T> {
+    private class Node<T> {
 
         private T data = null;
-
         private List<Node<T>> children = new ArrayList<>();
 
-        private Node<T> parent = null;
-
-        public Node(T data) {
+        Node(T data) {
             this.data = data;
         }
 
-        public Node<T> addChild(Node<T> child) {
-            child.setParent(this);
+        Node<T> addChild(Node<T> child) {
             this.children.add(child);
             return child;
         }
 
-        public T getData() {
-            return data;
-        }
-
-        public void setData(T data) {
-            this.data = data;
-        }
-
-        public Node<T> getParent() {
-            return parent;
-        }
-
-        public Node<T> useAction(T action){
+        Node<T> useAction(T action){
             for (Node n : this.getChildren()){
                 if (n.data == action){
                     return n;
@@ -154,10 +148,6 @@ public class CapabilityHandler {
 
         private List<Node<T>> getChildren() {
             return children;
-        }
-
-        private void setParent(Node<T> parent) {
-            this.parent = parent;
         }
     }
 }

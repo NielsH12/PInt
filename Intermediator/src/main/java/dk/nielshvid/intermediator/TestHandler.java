@@ -1,6 +1,6 @@
 package dk.nielshvid.intermediator;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class TestHandler {
@@ -9,20 +9,28 @@ public class TestHandler {
 
         CapabilityHandler capabilityHandler = new CapabilityHandler();
 
-
-
+//         HashSet<String> publicActions = new HashSet<String>(){{
+//            add("Freezer/insert");
+//             add("Freezer/insert");
+//        }};
+//
+//        System.out.println(publicActions.size());
 
 //        capTree.put("get", new CapabilityHandler.Node<String>());
 
         UUID test = UUID.randomUUID();
 
-        UUID capID = capabilityHandler.addCapability(test, "get");
+        String BoxID = "8602bac2-5b0e-409a-8d62-00c671c68a68@8602bac2-5b0e-409a-8d62-00c671c68a68";
 
-        System.out.println(capabilityHandler.useAction(test, capID,"retrieve"));
+        UUID capID = capabilityHandler.addCapability(test, BoxID, "BoxDB/get");
 
-        System.out.println(capabilityHandler.useAction(test, capID,"move"));
+        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"Freezer/retrieve"));
 
-        System.out.println(capabilityHandler.useAction(test, capID,"testCase"));
+        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"Freezer/retrieve"));
+
+        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"BoxDB/retrieve"));
+
+        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"BoxDB/retrieve"));
 
 
 

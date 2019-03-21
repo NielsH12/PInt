@@ -3,121 +3,126 @@ package dk.nielshvid.intermediator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 @Path("/")
 public class RestInterface{
-    private static HashMap<String, HashMap<String,Boolean>> policyMap = new HashMap<String, HashMap<String, Boolean>>() {{
-        put("Doctor", new HashMap<String,Boolean>(){{
-            put("get", true);
-            put("insert", false);
-            put("retrieve", true);
-        }});
-    }};
-
-    private Guard guard = new Guard(policyMap);
     private IdentityService identityService = new IdentityService();
-
-    @Path("Freezer/hello")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response hello (){
-        System.out.println("hello");
-        return null;
-    }
+    private Guard guard = new Guard(identityService);
 
     @Path("Freezer/insert")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response insertFreezer (@QueryParam("UserID") String UserID, @QueryParam("ID") String ID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
+    public Response insertFreezer (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
-        // capability
 
-        // Forward request
-        return IntermediatorClient.insertFreezer(UserID, ID, xPos, yPos);
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "Freezer/insert")){
+            // Forward request
+            return IntermediatorClient.insertFreezer(BoxID, xPos, yPos);
+        };
+
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
     }
 
     @Path("Freezer/retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response retrieveFreezer (@QueryParam("UserID") String UserID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
-
-        // capability
+    public Response retrieveFreezer (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
 
-        // Forward request
-        return IntermediatorClient.retrieveFreezer(UserID, xPos, yPos);
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "Freezer/retrieve")){
+            // Forward request
+            return IntermediatorClient.retrieveFreezer(UserID, BoxID, xPos, yPos);
+        };
+
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
     }
 
     @Path("BoxDB/get")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getBoxDB (@QueryParam("UserID") String UserID, @QueryParam("BoxID") String BoxID){
-        String Org = BoxID.substring(37);
+    public Response getBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
 
-        String role = identityService.getRole(UUID.fromString(UserID), UUID.fromString(Org));
+        // This structure can be optimized (maybe)
+        UUID CapabilityID = guard.generateCapability(UserID, BoxID, "BoxDB/get");
 
-        if(!guard.checkAccess(role, "get")){
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/get")){
+            // Forward request
+            return Response.fromResponse(IntermediatorClient.getBoxDB(UserID, BoxID)).header("Capability", CapabilityID).build();
+        };
 
-        // Forward request
-        return Response.fromResponse(IntermediatorClient.getBoxDB(UserID, BoxID)).header("cap","fisk").build();
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
     }
 
     @Path("BoxDB/insert")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response insertBoxDB (@QueryParam("UserID") String UserID, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
+    public Response insertBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
-        String Org = BoxID.substring(37);
 
-        String role = identityService.getRole(UUID.fromString(UserID), UUID.fromString(Org));
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/insert")){
+            // Forward request
+            return IntermediatorClient.insertBoxDB(BoxID, xPos, yPos);
+        };
 
-        if(!guard.checkAccess(role, "insert")){
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 
-        // Forward request
-        return IntermediatorClient.insertBoxDB(UserID, BoxID, xPos, yPos);
     }
 
     @Path("BoxDB/retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response retrieveBoxDB (@QueryParam("UserID") String UserID, @QueryParam("BoxID") String BoxID){
+    public Response retrieveBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
 
-        String Org = BoxID.substring(37);
 
-        String role = identityService.getRole(UUID.fromString(UserID), UUID.fromString(Org));
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/retrieve")){
+            // Forward request
+            return IntermediatorClient.retrieveBoxDB(UserID, BoxID);
+        };
 
-        if(!guard.checkAccess(role, "retrieve")){
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 
-        return Response.fromResponse(IntermediatorClient.getBoxDB(UserID, BoxID)).header("cap","hund").build();
     }
 
     @Path("BoxDB/findEmptySlot")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response findEmptySlotBoxDB (@QueryParam("UserID") String UserID){
+    public Response findEmptySlotBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
 
-        // Forward request
-        return IntermediatorClient.findEmptySlotBoxDB(UserID);
+        // This structure can be optimized (maybe)
+        UUID CapabilityID = guard.generateCapability(UserID, BoxID, "BoxDB/findEmptySlot");
+
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/findEmptySlot")){
+            // Forward request
+            return Response.fromResponse(IntermediatorClient.findEmptySlotBoxDB(UserID, BoxID)).header("Capability", CapabilityID).build();
+        };
+
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
     }
 
-
-    @Path("NielsErSej/testcase")
+    @Path("BoxDB/getID")
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response xxx (@QueryParam("UserID") String UserID, @QueryParam("BoxID") String BoxID){
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIDBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
-        
 
-        // Forward request
-        return IntermediatorClient.findEmptySlotBoxDB(UserID);
+        // Check policies
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/getID")){
+            // Forward request
+            return IntermediatorClient.getIDBoxDB(UserID, BoxID, xPos, yPos);
+        };
+
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
     }
 }

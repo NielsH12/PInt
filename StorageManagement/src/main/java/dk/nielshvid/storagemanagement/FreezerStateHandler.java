@@ -2,12 +2,17 @@ package dk.nielshvid.storagemanagement;
 
 import java.sql.*;
 import java.util.EmptyStackException;
-import java.util.UUID;
 
 public class FreezerStateHandler {
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
-    public static int InsertID(UUID id, int x, int y){
+    //Retrieve are in the boxHandler dont ask why!?
+
+
+    public static int InsertID(String _BoxID, int x, int y){
+
+        String BoxID = _BoxID.substring(0,36);
+
         CheckDrivers();
 
         String Query = "UPDATE [ffu].[dbo].FreezerState SET boxID=? WHERE x =? AND y =?";
@@ -16,7 +21,7 @@ public class FreezerStateHandler {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            stmt.setString(1,id.toString());
+            stmt.setString(1, BoxID);
             stmt.setInt(3, y);
             stmt.setInt(2,x);
 

@@ -20,9 +20,9 @@ public class RestClient {
     }
 
     public static String getBoxInfoByID(String UserID, String BoxID){
-        Response response = sendGetBoxInfoByIDv2(UserID, BoxID);
+        Response response = sendBoxDBGet(UserID, BoxID);
 
-        String fisk = response.getHeaderString("cap");
+        String fisk = response.getHeaderString("Capability");
 
         System.out.println(fisk);
 
@@ -38,11 +38,7 @@ public class RestClient {
     }
 
     public static String retrieveBoxByID(String BoxID, String UserID){
-        Response response = sendGetBoxInfoByIDv2(BoxID, UserID); // GET
-
-        String fisk = response.getHeaderString("cap");
-
-        System.out.println(fisk);
+        Response response = sendBoxDBGet(UserID, BoxID); // GET
 
         if(response.getStatus() != 200){
             return "Box is not in system" + response.getStatus();
@@ -54,13 +50,15 @@ public class RestClient {
             return "Box is out of the freezer";
         }
 
-        Response retrieveAutoResponse = sendRetrieveBoxFromAuto(BoxID, UserID);
+        UUID capability = UUID.fromString(response.getHeaderString("Capability"));
+
+        Response retrieveAutoResponse = sendFreezerRetrieve(UserID, capability, BoxID, t.posX, t.posY);
 
         if(retrieveAutoResponse.getStatus() != 200){
             return "Freezer can't retrieve box" + retrieveAutoResponse.getStatus();
         }
 
-        Response retrieveDDResponse = sendRetrieveBoxFromBoxDB(BoxID, UserID);
+        Response retrieveDDResponse = sendBoxDBRetrieve(UserID, capability, BoxID);
 
         if(retrieveDDResponse.getStatus() != 200){
             return "Database can't save box" + retrieveDDResponse.getStatus();
@@ -69,22 +67,22 @@ public class RestClient {
         return "Success";
     }
 
-    public static String insertBoxByID(String BoxID, String UserID){
-        Response response = sendGetBoxInfoByIDv2(BoxID, UserID); // GET
+    public static String insertBoxByID(String UserID, String BoxID){
+        Response response = sendBoxDBGet(UserID, BoxID); // GET
 
         if(response.getStatus() != 200){
             return "Box is not in system" + response.getStatus();
         }
 
-        String fisk = response.readEntity(String.class);
+        String entity = response.readEntity(String.class);
 
-        dbBox Box = gson.fromJson(fisk, dbBox.class);
+        dbBox Box = gson.fromJson(entity, dbBox.class);
 
         if(Box.posX != null || Box.posY != null){
             return "Box is already in Freezer";
         }
 
-        Response availableSlot = sendFindEmptySlot(UserID); // GET
+        Response availableSlot = sendFindEmptySlot(UserID, Box.id); // GET
 
         String s = availableSlot.readEntity(String.class);
 
@@ -94,7 +92,9 @@ public class RestClient {
             return "The freezer is full and can't take anymore boxes";
         }
 
-        Response insertResult = sendInsertBoxAuto(UserID, BoxID, integer[0], integer[1]);
+        UUID Capability = UUID.fromString(availableSlot.getHeaderString("Capability"));
+
+        Response insertResult = sendFreezerInsert(UserID, Capability, BoxID, integer[0], integer[1]);
 
         if(insertResult.getStatus() != 200){
             return "Automation can't insert box " + insertResult.getStatus();
@@ -106,7 +106,7 @@ public class RestClient {
             return "Something went really wrong";
         }
 
-        Response insertAutoResult = sendInsertBoxDB(UserID, BoxID, integer[0], integer[1]);
+        Response insertAutoResult = sendBoxDBInsert(UserID, Capability, BoxID, integer[0], integer[1]);
 
         if(insertAutoResult.getStatus() != 200){
             return "Database had an error " + insertAutoResult.getStatus();
@@ -115,28 +115,28 @@ public class RestClient {
         return "Success";
     }
 
-    private static Response sendRetrieveBoxFromBoxDB(String BoxID, String userID){
-        return client.target(REST_URI_Intermediator + "BoxDB/retrieve?ID=" + BoxID + "&UserID=" + userID).request().get();
+    private static Response sendBoxDBRetrieve(String userID, UUID Capability, String BoxID){
+        return client.target(REST_URI_Intermediator + "BoxDB/retrieve?UserID=" + userID + "&Capability=" + Capability + "&BoxID=" + BoxID).request().get();
     }
 
-    private static Response sendRetrieveBoxFromAuto(String BoxID, String userID){
-        return client.target(REST_URI_Intermediator + "Freezer/retrieve?ID=" + BoxID + "&UserID=" + userID).request().get();
+    private static Response sendFreezerRetrieve(String userID, UUID Capability, String BoxID, int xPos, int yPos){
+        return client.target(REST_URI_Intermediator + "Freezer/retrieve?UserID=" + userID + "&Capability=" + Capability + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
     }
 
-    private static Response sendGetBoxInfoByIDv2(String userID, String BoxID){
+    private static Response sendBoxDBGet(String userID, String BoxID){
         return client.target(REST_URI_Intermediator + "BoxDB/get?UserID=" + userID + "&BoxID=" + BoxID).request().get();
     }
 
-    private static Response sendFindEmptySlot(String userID){
-        return client.target(REST_URI_Intermediator + "BoxDB/findEmptySlot?UserID=" + userID).request().get();
+    private static Response sendFindEmptySlot(String userID, String BoxID){
+        return client.target(REST_URI_Intermediator + "BoxDB/findEmptySlot?UserID=" + userID + "&BoxID=" + BoxID).request().get();
     }
 
-    private static Response sendInsertBoxDB(String userID, String BoxID, int xPos, int yPos){
-        return client.target(REST_URI_Intermediator + "BoxDB/insert?UserID=" + userID + "&ID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get(); // GET
+    private static Response sendBoxDBInsert(String userID, UUID Capability, String BoxID, int xPos, int yPos){
+        return client.target(REST_URI_Intermediator + "BoxDB/insert?UserID=" + userID + "&Capability=" + Capability + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get(); // GET
     }
 
-    private static Response sendInsertBoxAuto(String userID, String BoxID, int xPos, int yPos){
-        return client.target(REST_URI_Intermediator + "Freezer/insert?UserID=" + userID + "&ID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get(); // GET
+    private static Response sendFreezerInsert(String userID, UUID Capability, String BoxID, int xPos, int yPos){
+        return client.target(REST_URI_Intermediator + "Freezer/insert?UserID=" + userID + "&Capability=" + Capability + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get(); // GET
     }
 
     public static void main(String[] args){
