@@ -1,10 +1,14 @@
 package dk.nielshvid.intermediator;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class CapabilityHandler {
     private static HashMap<UUID, Capability> capabilities = new HashMap<>();
     private static LocalTime lastClean = LocalTime.now();
+    private static final int CAPABILITY_LIFETIME_SECONDS = 300;
     private HashMap<String, Node<String>> treeTemplates = new HashMap<String, Node<String>>(){{
 
         put("BoxDB/get", new Node<String>("BoxDB/get"){{
@@ -19,7 +23,6 @@ public class CapabilityHandler {
                 }});
             }});
         }});
-
     }};
 
 
@@ -37,21 +40,15 @@ public class CapabilityHandler {
     }
 
     boolean authorize(UUID UserID, String boxID, UUID CapabilityID, String action){
-        System.out.println("CapabilityHandler.authorize()");
-
         if(lastClean.plusHours(24).isBefore(LocalTime.now())){
-            System.out.println("\t More than 24 hours since last clean");
             cleanCapabilities();
         }
 
         if(!capabilities.containsKey(CapabilityID)){
-            System.out.println("\t Capability key is not recognized");
             return false;
         }
 
         boolean result =  capabilities.get(CapabilityID).useAction(UserID, boxID, action);
-        System.out.println("\t Trying to perform action: " + " " + action + ": " + result);
-
         if(capabilities.get(CapabilityID).delete()){
             capabilities.remove(CapabilityID);
         }
@@ -61,15 +58,13 @@ public class CapabilityHandler {
     private void cleanCapabilities(){
         lastClean = LocalTime.now();
 
-        ArrayList<UUID> test = new ArrayList<>(capabilities.keySet());
-
-        for (UUID i : test){
+        ArrayList<UUID> tempUUIDList = new ArrayList<>(capabilities.keySet());
+        for (UUID i : tempUUIDList){
             if (capabilities.get(i).delete()){
                 capabilities.remove(i);
             }
         }
     }
-
 
     private class Capability {
         private LocalTime lastUsed;
@@ -93,7 +88,7 @@ public class CapabilityHandler {
 
         boolean delete(){
             LocalTime temp = LocalTime.now();
-            if(!temp.isBefore(lastUsed.plusSeconds(300))){ // debug value
+            if(!temp.isBefore(lastUsed.plusSeconds(CAPABILITY_LIFETIME_SECONDS))){ // debug value
                 return true;
             }
             return false;
@@ -110,7 +105,7 @@ public class CapabilityHandler {
                 return false;
             }
 
-            if(!temp.isBefore(lastUsed.plusSeconds(300))){ // debug value
+            if(!temp.isBefore(lastUsed.plusSeconds(CAPABILITY_LIFETIME_SECONDS))){ // debug value
                 return false;
             }
 

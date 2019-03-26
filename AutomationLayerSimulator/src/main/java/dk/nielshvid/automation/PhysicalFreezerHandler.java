@@ -6,7 +6,7 @@ import java.util.EmptyStackException;
 import java.util.List;
 
 
-public class FreezerHandler {
+public class PhysicalFreezerHandler {
 
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
@@ -17,7 +17,7 @@ public class FreezerHandler {
             _BoxID = BoxID.substring(0,36);
         }
 
-        String Query = "UPDATE [ffu].[dbo].[Freezer] SET boxID = ? WHERE Freezer.x = ? AND Freezer.y = ?";
+        String Query = "UPDATE [ffu].[dbo].[PhysicalFreezer] SET boxID = ? WHERE PhysicalFreezer.x = ? AND PhysicalFreezer.y = ?";
 
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -45,9 +45,9 @@ public class FreezerHandler {
         return false;
     }
 
-    public static Freezer[][] GetFreezerState(){
+    public static Freezer[][] GetPhysicalFreezerState(){
 
-        String Query = "SELECT * FROM [ffu].[dbo].[Freezer]";
+        String Query = "SELECT * FROM [ffu].[dbo].[PhysicalFreezer]";
 
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

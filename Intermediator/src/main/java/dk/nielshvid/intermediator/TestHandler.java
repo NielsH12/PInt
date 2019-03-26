@@ -1,38 +1,30 @@
 package dk.nielshvid.intermediator;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class TestHandler {
 
-    public static void main(String[] arg){
 
-        CapabilityHandler capabilityHandler = new CapabilityHandler();
 
-//         HashSet<String> publicActions = new HashSet<String>(){{
-//            add("Freezer/insert");
-//             add("Freezer/insert");
-//        }};
-//
-//        System.out.println(publicActions.size());
-
-//        capTree.put("get", new CapabilityHandler.Node<String>());
+    public static void main(String[] arg) {
 
         UUID test = UUID.randomUUID();
 
-        String BoxID = "8602bac2-5b0e-409a-8d62-00c671c68a68@8602bac2-5b0e-409a-8d62-00c671c68a68";
-
-        UUID capID = capabilityHandler.addCapability(test, BoxID, "BoxDB/get");
-
-        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"Freezer/retrieve"));
-
-        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"Freezer/retrieve"));
-
-        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"BoxDB/retrieve"));
-
-        System.out.println(capabilityHandler.authorize(test, BoxID, capID,"BoxDB/retrieve"));
+        String BoxID = "69E16635-F76F-403C-A231-18E666F04FC2@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
+        UUID Jens = UUID.fromString("B6F64D8F-1916-4236-9BBA-039A380329AD");
 
 
+        IdentityService identityService = new IdentityService();
+
+        Guard guard = new Guard(identityService);
+
+
+        System.out.println(guard.authorize(Jens.toString(), BoxID, null, "fiskeLars", -8, 5));
+
+
+    }
+}
 
 
 
@@ -51,5 +43,4 @@ public class TestHandler {
 //
 //        System.out.println(result);
 
-    }
-}
+

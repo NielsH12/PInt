@@ -16,7 +16,7 @@ public class RestInterface {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Viewable home() {
-        Freezer[][] state = FreezerHandler.GetFreezerState();
+        Freezer[][] state = PhysicalFreezerHandler.GetPhysicalFreezerState();
 
         Map<String, String> model = new HashMap<>();
         model.put("s00", state[0][0].htmlString());
@@ -42,7 +42,7 @@ public class RestInterface {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String retrieve(@QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
-        if (FreezerHandler.updateByPos(x,y,null)){
+        if (PhysicalFreezerHandler.updateByPos(x,y,null)){
             return "Success";
         }
 
@@ -53,7 +53,7 @@ public class RestInterface {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String insert(@QueryParam("BoxID") String ID, @QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
-        if (FreezerHandler.updateByPos(x,y,ID)){
+        if (PhysicalFreezerHandler.updateByPos(x,y,ID)){
             return "Success";
         }
 

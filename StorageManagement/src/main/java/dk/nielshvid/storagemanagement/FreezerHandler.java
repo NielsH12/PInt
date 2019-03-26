@@ -3,7 +3,8 @@ package dk.nielshvid.storagemanagement;
 import java.sql.*;
 import java.util.EmptyStackException;
 
-public class FreezerStateHandler {
+
+public class FreezerHandler {
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
     //Retrieve are in the boxHandler dont ask why!?
@@ -15,7 +16,7 @@ public class FreezerStateHandler {
 
         CheckDrivers();
 
-        String Query = "UPDATE [ffu].[dbo].FreezerState SET boxID=? WHERE x =? AND y =?";
+        String Query = "UPDATE [ffu].[dbo].Freezer SET boxID=? WHERE x =? AND y =?";
 
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
@@ -45,7 +46,7 @@ public class FreezerStateHandler {
     public static int[] FindEmptySlot()  {
         CheckDrivers();
 
-        String Query = "SELECT TOP(1) x,y FROM [ffu].[dbo].[FreezerState] WHERE boxID IS NULL";
+        String Query = "SELECT TOP(1) x,y FROM [ffu].[dbo].[Freezer] WHERE boxID IS NULL";
 
 
         try (Connection con = DriverManager.getConnection(connectionUrl)) {

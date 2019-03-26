@@ -20,7 +20,7 @@ public class BoxHandler {
 
         String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration, FS.x, FS.y, Box.organizationID\n" +
                 "FROM [ffu].[dbo].[Box]\n" +
-                "LEFT OUTER JOIN [ffu].[dbo].[FreezerState] FS on Box.id = FS.boxID\n" +
+                "LEFT OUTER JOIN [ffu].[dbo].[Freezer] FS on Box.id = FS.boxID\n" +
                 "INNER JOIN [ffu].[dbo].[Persons] P on Box.owner = P.id\n" +
                 "WHERE Box.id = ? AND Box.organizationID = ?";
 
@@ -71,7 +71,7 @@ public class BoxHandler {
 
         String Query = "BEGIN TRY\n" +
                 "BEGIN TRANSACTION\n" +
-                "        UPDATE [ffu].[dbo].[FreezerState] SET boxID = null WHERE boxID =?\n" +
+                "        UPDATE [ffu].[dbo].[Freezer] SET boxID = null WHERE boxID =?\n" +
                 "        UPDATE [ffu].[dbo].[Box] SET accessed = GETDATE() WHERE id =?\n" +
                 "COMMIT\n" +
                 "END TRY\n" +

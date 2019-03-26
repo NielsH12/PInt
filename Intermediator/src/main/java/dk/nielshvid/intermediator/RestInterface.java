@@ -19,7 +19,7 @@ public class RestInterface{
         // Check policies
         if (guard.authorize(UserID, BoxID, Capability, "Freezer/insert")){
             // Forward request
-            return IntermediatorClient.insertFreezer(BoxID, xPos, yPos);
+            return IntermediatorClient.insertFreezer(UserID, BoxID, xPos, yPos);
         };
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -67,9 +67,9 @@ public class RestInterface{
 
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/insert")){
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/insert", xPos, yPos)){
             // Forward request
-            return IntermediatorClient.insertBoxDB(BoxID, xPos, yPos);
+            return IntermediatorClient.insertBoxDB(UserID, BoxID, xPos, yPos);
         };
 
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -125,4 +125,5 @@ public class RestInterface{
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 
     }
+
 }

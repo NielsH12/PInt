@@ -10,9 +10,9 @@ public class TestSQL {
     }
 
     static void FindEmptySlot(){
-        FreezerStateHandler freezerStateHandler = new FreezerStateHandler();
+        FreezerHandler freezerHandler = new FreezerHandler();
 
-        int[] result = freezerStateHandler.FindEmptySlot();
+        int[] result = freezerHandler.FindEmptySlot();
         System.out.println(result[0] + " " + result[1]);
     }
 
