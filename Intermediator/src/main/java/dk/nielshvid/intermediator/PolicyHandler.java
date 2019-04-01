@@ -1,9 +1,16 @@
 package dk.nielshvid.intermediator;
 
 import javax.ws.rs.core.MultivaluedMap;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 
-public class PolicyHandler {
+public class PolicyHandler{
+    private static Oracles oracles;
+
+    public PolicyHandler(Oracles oracles){
+        this.oracles = oracles;
+    }
 
     private static HashMap<String, HashMap<String,Condition>> policyMap = new HashMap<String, HashMap<String, Condition>>() {{
         put("Decan", new HashMap<String,Condition>(){{
@@ -11,7 +18,7 @@ public class PolicyHandler {
         put("Doctor", new HashMap<String,Condition>(){{
             put("Freezer/retrieve", map -> Integer.parseInt(map.getFirst("xPos")) > -1 && Integer.parseInt(map.getFirst("yPos")) > -1);
             put("fiskeLars", map -> Integer.parseInt(map.getFirst("xPos")) > -1 && Integer.parseInt(map.getFirst("yPos")) > -1);
-            put("Freezer/insert", map -> true);
+            put("Freezer/insert", map -> toEpoch(oracles.getAccessed("")) < toEpoch(LocalDateTime.now()));
             put("BoxDB/retrieve", map -> true);
             put("BoxDB/insert", map -> true);
         }});
@@ -20,18 +27,6 @@ public class PolicyHandler {
         put("Student", new HashMap<String,Condition>(){{
         }});
     }};
-
-//    public boolean authorize(String Role, String Action){
-//        System.out.println("PolicyHandler.authorize()");
-//        try {
-//            System.out.println("\t Authorized");
-//            return policyMap.get(Role).get(Action).evaluate();
-//        }
-//        catch (Exception e){
-//            System.out.println("\t " + Role + " is not allowed to perform action: " + Action);
-//            return false;
-//        }
-//    }
 
     public boolean authorize(String Role, String Action, MultivaluedMap<String, String> map){
         System.out.println("PolicyHandler.authorize()");
@@ -48,4 +43,9 @@ public class PolicyHandler {
     private interface Condition {
         boolean evaluate(MultivaluedMap<String, String> fisk);
     }
+
+    private static long toEpoch(LocalDateTime dateTime){
+        return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
 }
