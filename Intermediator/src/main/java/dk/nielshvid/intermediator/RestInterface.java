@@ -7,7 +7,8 @@ import java.util.UUID;
 @Path("/")
 public class RestInterface{
     private IdentityService identityService = new IdentityService();
-    private Guard guard = new Guard(identityService);
+    private Oracales oracales = new Oracales();
+    private Guard guard = new Guard(identityService, oracales);
 
     // request skal opfylde den rigtige type på QueryParam, ellers rammer den ikke dette endpoint
     @Path("/query")

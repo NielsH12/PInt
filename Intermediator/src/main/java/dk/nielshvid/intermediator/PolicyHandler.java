@@ -6,9 +6,9 @@ import java.time.ZoneId;
 import java.util.HashMap;
 
 public class PolicyHandler{
-    private static Oracles oracles;
+    private static OraclesInterface oracles;
 
-    public PolicyHandler(Oracles oracles){
+    public PolicyHandler(OraclesInterface oracles){
         this.oracles = oracles;
     }
 

@@ -25,8 +25,9 @@ public class TestHandler {
                 return "Doctor";
             }
         };
+        Oracales oracales = new Oracales();
 
-        Guard guard = new Guard(identityService);
+        Guard guard = new Guard(identityService, oracales);
 
         List<String> fisk = new ArrayList<>();
         fisk.add("3");

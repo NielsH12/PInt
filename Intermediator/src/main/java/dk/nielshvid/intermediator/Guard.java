@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class Guard {
-    private PolicyHandler policyHandler = new PolicyHandler();
+    private PolicyHandler policyHandler;
     private CapabilityHandler capabilityHandler = new CapabilityHandler();
     private IdentityServiceInterface identityService;
     private static HashSet<String> publicActions = new HashSet<String>() {{
@@ -22,8 +22,9 @@ public class Guard {
         add("BoxDB/insert");
     }};
 
-    Guard(IdentityServiceInterface identityService){
+    Guard(IdentityServiceInterface identityService, OraclesInterface oracles){
         this.identityService = identityService;
+        this.policyHandler = new PolicyHandler(oracles);
     }
 
     public UUID generateCapability(String UserID, String BoxID, String action, MultivaluedMap<String, String> map){
