@@ -1,6 +1,10 @@
 package dk.nielshvid.intermediator;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class TestHandler {
@@ -15,12 +19,27 @@ public class TestHandler {
         UUID Jens = UUID.fromString("B6F64D8F-1916-4236-9BBA-039A380329AD");
 
 
-        IdentityService identityService = new IdentityService();
+        IdentityService identityService = new IdentityService(){
+            @Override
+            public String getRole(UUID UserID, String BoxID){
+                return "Doctor";
+            }
+        };
 
         Guard guard = new Guard(identityService);
 
+        List<String> fisk = new ArrayList<>();
+        fisk.add("3");
 
-        System.out.println(guard.authorize(Jens.toString(), BoxID, null, "fiskeLars", -8, 5));
+        List<String> y = new ArrayList<>();
+        y.add("2");
+
+        MultivaluedMap<String, String> queryParamMap = new MultivaluedHashMap<String, String>(){{
+            put("xPos", fisk);
+            put("yPos", y);
+        }};
+
+        System.out.println(guard.authorize(Jens.toString(), BoxID, null, "fiskeLars", queryParamMap));
 
 
     }

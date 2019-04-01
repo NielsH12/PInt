@@ -1,8 +1,7 @@
 package dk.nielshvid.intermediator;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.util.UUID;
 
 @Path("/")
@@ -10,14 +9,29 @@ public class RestInterface{
     private IdentityService identityService = new IdentityService();
     private Guard guard = new Guard(identityService);
 
+    // request skal opfylde den rigtige type på QueryParam, ellers rammer den ikke dette endpoint
+    @Path("/query")
+    public Response getUsers(@Context UriInfo info, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos) {
+
+        String from = info.getQueryParameters().getFirst("from");
+        String to = info.getQueryParameters().getFirst("to");
+
+        MultivaluedMap<String, String> queryParamMap = info.getQueryParameters();
+
+
+        return Response
+                .status(200)
+                .entity("getUsers is called, from : " + from + ", to : " + to
+                        + ", orderBy" ).build();
+    }
+
     @Path("Freezer/insert")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response insertFreezer (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
-
+    public Response insertFreezer (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "Freezer/insert")){
+        if (guard.authorize(UserID, BoxID, Capability, "Freezer/insert", info.getQueryParameters())){
             // Forward request
             return IntermediatorClient.insertFreezer(UserID, BoxID, xPos, yPos);
         };
@@ -29,11 +43,10 @@ public class RestInterface{
     @Path("Freezer/retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response retrieveFreezer (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
-
+    public Response retrieveFreezer (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "Freezer/retrieve")){
+        if (guard.authorize(UserID, BoxID, Capability, "Freezer/retrieve", info.getQueryParameters())){
             // Forward request
             return IntermediatorClient.retrieveFreezer(UserID, BoxID, xPos, yPos);
         };
@@ -45,13 +58,13 @@ public class RestInterface{
     @Path("BoxDB/get")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
+    public Response getBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
 
         // This structure can be optimized (maybe)
-        UUID CapabilityID = guard.generateCapability(UserID, BoxID, "BoxDB/get");
+        UUID CapabilityID = guard.generateCapability(UserID, BoxID, "BoxDB/get", info.getQueryParameters());
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/get")){
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/get", info.getQueryParameters())){
             // Forward request
             return Response.fromResponse(IntermediatorClient.getBoxDB(UserID, BoxID)).header("Capability", CapabilityID).build();
         };
@@ -63,11 +76,10 @@ public class RestInterface{
     @Path("BoxDB/insert")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response insertBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
-
+    public Response insertBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/insert", xPos, yPos)){
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/insert", info.getQueryParameters())){
             // Forward request
             return IntermediatorClient.insertBoxDB(UserID, BoxID, xPos, yPos);
         };
@@ -79,11 +91,10 @@ public class RestInterface{
     @Path("BoxDB/retrieve")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response retrieveBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
-
+    public Response retrieveBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/retrieve")){
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/retrieve", info.getQueryParameters())){
             // Forward request
             return IntermediatorClient.retrieveBoxDB(UserID, BoxID);
         };
@@ -95,13 +106,13 @@ public class RestInterface{
     @Path("BoxDB/findEmptySlot")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response findEmptySlotBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
+    public Response findEmptySlotBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID){
 
         // This structure can be optimized (maybe)
-        UUID CapabilityID = guard.generateCapability(UserID, BoxID, "BoxDB/findEmptySlot");
+        UUID CapabilityID = guard.generateCapability(UserID, BoxID, "BoxDB/findEmptySlot", info.getQueryParameters());
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/findEmptySlot")){
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/findEmptySlot", info.getQueryParameters())){
             // Forward request
             return Response.fromResponse(IntermediatorClient.findEmptySlotBoxDB(UserID, BoxID)).header("Capability", CapabilityID).build();
         };
@@ -113,11 +124,11 @@ public class RestInterface{
     @Path("BoxDB/getID")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getIDBoxDB (@QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
+    public Response getIDBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("BoxID") String BoxID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
 
 
         // Check policies
-        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/getID")){
+        if (guard.authorize(UserID, BoxID, Capability, "BoxDB/getID", info.getQueryParameters())){
             // Forward request
             return IntermediatorClient.getIDBoxDB(UserID, BoxID, xPos, yPos);
         };

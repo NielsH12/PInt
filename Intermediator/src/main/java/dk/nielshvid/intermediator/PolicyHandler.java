@@ -1,5 +1,6 @@
 package dk.nielshvid.intermediator;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 
 public class PolicyHandler {
@@ -8,40 +9,11 @@ public class PolicyHandler {
         put("Decan", new HashMap<String,Condition>(){{
         }});
         put("Doctor", new HashMap<String,Condition>(){{
-            put("Freezer/retrieve", new Condition() {
-                @Override
-                public boolean evaluate(int x, int y) {
-                    return x > -1 && y > -1;
-                }
-            });
-            put("fiskeLars", new Condition() {
-                @Override
-                public boolean evaluate(int x, int y) {
-                    return x > -1 && y > -1;
-                }
-            });
-            put("Freezer/insert",new Condition() {
-                @Override
-                public boolean evaluate() {
-                    return true;
-                }
-                @Override
-                public boolean evaluate(int x, int y) {
-                    return true;
-                }
-            });
-            put("BoxDB/retrieve", new Condition() {
-                @Override
-                public boolean evaluate() {
-                    return true;
-                }
-            });
-            put("BoxDB/insert", new Condition() {
-                @Override
-                public boolean evaluate() {
-                    return true;
-                }
-            });
+            put("Freezer/retrieve", map -> Integer.parseInt(map.getFirst("xPos")) > -1 && Integer.parseInt(map.getFirst("yPos")) > -1);
+            put("fiskeLars", map -> Integer.parseInt(map.getFirst("xPos")) > -1 && Integer.parseInt(map.getFirst("yPos")) > -1);
+            put("Freezer/insert", map -> true);
+            put("BoxDB/retrieve", map -> true);
+            put("BoxDB/insert", map -> true);
         }});
         put("Assistant", new HashMap<String,Condition>(){{
         }});
@@ -49,23 +21,23 @@ public class PolicyHandler {
         }});
     }};
 
-    public boolean authorize(String Role, String Action){
-        System.out.println("PolicyHandler.authorize()");
-        try {
-            System.out.println("\t Authorized");
-            return policyMap.get(Role).get(Action).evaluate();
-        }
-        catch (Exception e){
-            System.out.println("\t " + Role + " is not allowed to perform action: " + Action);
-            return false;
-        }
-    }
+//    public boolean authorize(String Role, String Action){
+//        System.out.println("PolicyHandler.authorize()");
+//        try {
+//            System.out.println("\t Authorized");
+//            return policyMap.get(Role).get(Action).evaluate();
+//        }
+//        catch (Exception e){
+//            System.out.println("\t " + Role + " is not allowed to perform action: " + Action);
+//            return false;
+//        }
+//    }
 
-    public boolean authorize(String Role, String Action, int x, int y){
+    public boolean authorize(String Role, String Action, MultivaluedMap<String, String> map){
         System.out.println("PolicyHandler.authorize()");
         try {
 //            System.out.println("\t Authorize");
-            return policyMap.get(Role).get(Action).evaluate(x, y);
+            return policyMap.get(Role).get(Action).evaluate(map);
         }
         catch (Exception e){
             System.out.println("\t " + Role + " is not allowed to perform action: " + Action);
@@ -74,13 +46,6 @@ public class PolicyHandler {
     }
 
     private interface Condition {
-
-        default boolean evaluate(int x, int y) {
-            return false;
-        }
-
-        default boolean evaluate() {
-            return false;
-        }
+        boolean evaluate(MultivaluedMap<String, String> fisk);
     }
 }
