@@ -3,7 +3,6 @@ package dk.nielshvid.intermediator;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +24,7 @@ public class TestHandler {
                 return "Doctor";
             }
         };
-        Oracales oracales = new Oracales();
+        Oracles oracales = new Oracles();
 
         Guard guard = new Guard(identityService, oracales);
 
