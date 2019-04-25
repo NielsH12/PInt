@@ -1,10 +1,8 @@
 package dk.nielshvid.intermediator;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.google.gson.Gson;
+import dk.nielshvid.intermediator.Entities.Sample;
+
 
 public class TestHandler {
 
@@ -12,34 +10,57 @@ public class TestHandler {
 
     public static void main(String[] arg) {
 
-        UUID test = UUID.randomUUID();
+        String jsonData = "[{\"created\":\"Name1\",\"Age\":20},{\"Name\":\"Name2\",\"Age\":23},{\"Name\":\"Name3\",\"Age\":28}]";
 
-        String BoxID = "69E16635-F76F-403C-A231-18E666F04FC2@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
-        UUID Jens = UUID.fromString("B6F64D8F-1916-4236-9BBA-039A380329AD");
+        Gson gson = new Gson();
 
 
-        IdentityService identityService = new IdentityService(){
-            @Override
-            public String getRole(UUID UserID, String BoxID){
-                return "Doctor";
-            }
-        };
-        Oracles oracales = new Oracles();
+        Sample test = new Sample();
 
-        Guard guard = new Guard(identityService, oracales);
 
-        List<String> fisk = new ArrayList<>();
-        fisk.add("3");
+        test.temperature = 1;
 
-        List<String> y = new ArrayList<>();
-        y.add("2");
 
-        MultivaluedMap<String, String> queryParamMap = new MultivaluedHashMap<String, String>(){{
-            put("xPos", fisk);
-            put("yPos", y);
-        }};
+        String test3 = gson.toJson(test);
 
-        System.out.println(guard.authorize(Jens.toString(), BoxID, null, "fiskeLars", queryParamMap));
+        Sample nysample = gson.fromJson(test3, Sample.class);
+
+        System.out.println("hej");
+
+
+//
+//
+//
+//
+//
+//        UUID test = UUID.randomUUID();
+//
+//        String BoxID = "69E16635-F76F-403C-A231-18E666F04FC2@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
+//        UUID Jens = UUID.fromString("B6F64D8F-1916-4236-9BBA-039A380329AD");
+//
+//
+//        IdentityService identityService = new IdentityService(){
+//            @Override
+//            public String getRole(UUID UserID, String BoxID){
+//                return "Doctor";
+//            }
+//        };
+//        Oracles oracales = new Oracles();
+//
+//        Guard guard = new Guard(identityService, oracales);
+//
+//        List<String> fisk = new ArrayList<>();
+//        fisk.add("3");
+//
+//        List<String> y = new ArrayList<>();
+//        y.add("2");
+//
+//        MultivaluedMap<String, String> queryParamMap = new MultivaluedHashMap<String, String>(){{
+//            put("xPos", fisk);
+//            put("yPos", y);
+//        }};
+//
+//        System.out.println(guard.authorize(Jens.toString(), BoxID, null, "fiskeLars", queryParamMap));
 
 
     }

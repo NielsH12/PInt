@@ -7,6 +7,7 @@ import java.util.UUID;
 public class IdentityService implements IdentityServiceInterface{
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
+    @Override
     public String getRole(UUID UserID, String BoxID){
         UUID OrgID;
         try {
@@ -30,6 +31,11 @@ public class IdentityService implements IdentityServiceInterface{
         }
 
         return getRole(UserID, parrentOrgResult);
+    }
+
+    @Override
+    public String getEntityType(String EntityID) {
+        return "Sample";
     }
 
     private String findParrentOrg(UUID OrgID)  {
