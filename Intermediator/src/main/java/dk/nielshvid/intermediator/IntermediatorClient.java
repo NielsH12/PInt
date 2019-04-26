@@ -12,45 +12,44 @@ public class IntermediatorClient{
     private static Client client = ClientBuilder.newClient();
 
 
-    public static Response insertFreezer(String UserID, String BoxID, int xPos, int yPos){
+    public static Response insertFreezer(String UserID, String EntityID, int xPos, int yPos){
 
-        return client.target(REST_URI_Freezer + "insert?UserID=" + UserID + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
+        return client.target(REST_URI_Freezer + "insert?UserID=" + UserID + "&EntityID=" + EntityID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
     }
 
 
-    public static Response retrieveFreezer(String UserID, String BoxID, int xPos, int yPos){
+    public static Response retrieveFreezer(String UserID, String EntityID, int xPos, int yPos){
 
-        return client.target(REST_URI_Freezer + "retrieve?UserID=" + UserID + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
+        return client.target(REST_URI_Freezer + "retrieve?UserID=" + UserID + "&EntityID=" + EntityID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
     }
 
 
-    public static Response getBoxDB(String UserID, String BoxID){
+    public static Response getBoxDB(String UserID, String EntityID){
 
-        return client.target(REST_URI_BoxDB + "get?UserID=" + UserID + "&BoxID=" + BoxID).request().get();
+        return client.target(REST_URI_BoxDB + "get?UserID=" + UserID + "&EntityID=" + EntityID).request().get();
     }
 
 
-    public static Response insertBoxDB(String UserID, String BoxID, int xPos, int yPos){
+    public static Response insertBoxDB(String UserID, String EntityID, int xPos, int yPos){
 
-        return client.target(REST_URI_BoxDB + "insert?UserID=" + UserID + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
+        return client.target(REST_URI_BoxDB + "insert?UserID=" + UserID + "&EntityID=" + EntityID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
     }
 
 
-    public static Response retrieveBoxDB(String UserID, String BoxID){
+    public static Response retrieveBoxDB(String UserID, String EntityID){
 
-        return client.target(REST_URI_BoxDB + "retrieve?UserID=" + UserID + "&BoxID=" + BoxID).request().get();
+        return client.target(REST_URI_BoxDB + "retrieve?UserID=" + UserID + "&EntityID=" + EntityID).request().get();
     }
 
 
-    public static Response findEmptySlotBoxDB(String UserID, String BoxID){
+    public static Response findEmptySlotBoxDB(String UserID, String EntityID){
 
-        return client.target(REST_URI_BoxDB + "findEmptySlot?UserID=" + UserID + "&BoxID=" + BoxID).request().get();
+        return client.target(REST_URI_BoxDB + "findEmptySlot?UserID=" + UserID + "&EntityID=" + EntityID).request().get();
     }
 
 
-    public static Response getIDBoxDB(String UserID, String BoxID, int xPos, int yPos){
+    public static Response getIDBoxDB(String UserID, String EntityID, int xPos, int yPos){
 
-        return client.target(REST_URI_BoxDB + "getID?UserID=" + UserID + "&BoxID=" + BoxID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
+        return client.target(REST_URI_BoxDB + "getID?UserID=" + UserID + "&EntityID=" + EntityID + "&xPos=" + xPos + "&yPos=" + yPos).request().get();
     }
-
 }

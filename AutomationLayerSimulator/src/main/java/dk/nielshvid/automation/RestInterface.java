@@ -52,7 +52,7 @@ public class RestInterface {
     @Path("insert")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String insert(@QueryParam("BoxID") String ID, @QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
+    public String insert(@QueryParam("EntityID") String ID, @QueryParam("xPos") int x, @QueryParam("yPos") int y)  {
         if (PhysicalFreezerHandler.updateByPos(x,y,ID)){
             return "Success";
         }

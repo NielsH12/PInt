@@ -8,10 +8,10 @@ public class IdentityService implements IdentityServiceInterface{
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
 
     @Override
-    public String getRole(UUID UserID, String BoxID){
+    public String getRole(UUID UserID, String EntityID){
         UUID OrgID;
         try {
-            OrgID = UUID.fromString(BoxID.substring(37));
+            OrgID = UUID.fromString(EntityID.substring(37));
         }
         catch (Exception e){
             return null;

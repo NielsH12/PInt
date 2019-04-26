@@ -10,19 +10,19 @@ public class FreezerHandler {
     //Retrieve are in the boxHandler dont ask why!?
 
 
-    public static int InsertID(String _BoxID, int x, int y){
+    public static int InsertID(String _EntityID, int x, int y){
 
-        String BoxID = _BoxID.substring(0,36);
+        String EntityID = _EntityID.substring(0,36);
 
         CheckDrivers();
 
-        String Query = "UPDATE [ffu].[dbo].Freezer SET boxID=? WHERE x =? AND y =?";
+        String Query = "UPDATE [ffu].[dbo].Freezer SET EntityID=? WHERE x =? AND y =?";
 
         try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            stmt.setString(1, BoxID);
+            stmt.setString(1, EntityID);
             stmt.setInt(3, y);
             stmt.setInt(2,x);
 
@@ -46,7 +46,7 @@ public class FreezerHandler {
     public static int[] FindEmptySlot()  {
         CheckDrivers();
 
-        String Query = "SELECT TOP(1) x,y FROM [ffu].[dbo].[Freezer] WHERE boxID IS NULL";
+        String Query = "SELECT TOP(1) x,y FROM [ffu].[dbo].[Freezer] WHERE EntityID IS NULL";
 
 
         try (Connection con = DriverManager.getConnection(connectionUrl)) {

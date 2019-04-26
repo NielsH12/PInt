@@ -35,13 +35,13 @@ public class TestHandler {
 //
 //        UUID test = UUID.randomUUID();
 //
-//        String BoxID = "69E16635-F76F-403C-A231-18E666F04FC2@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
+//        String EntityID = "69E16635-F76F-403C-A231-18E666F04FC2@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
 //        UUID Jens = UUID.fromString("B6F64D8F-1916-4236-9BBA-039A380329AD");
 //
 //
 //        IdentityService identityService = new IdentityService(){
 //            @Override
-//            public String getRole(UUID UserID, String BoxID){
+//            public String getRole(UUID UserID, String EntityID){
 //                return "Doctor";
 //            }
 //        };
@@ -60,7 +60,7 @@ public class TestHandler {
 //            put("yPos", y);
 //        }};
 //
-//        System.out.println(guard.authorize(Jens.toString(), BoxID, null, "fiskeLars", queryParamMap));
+//        System.out.println(guard.authorize(Jens.toString(), EntityID, null, "fiskeLars", queryParamMap));
 
 
     }

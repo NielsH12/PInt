@@ -13,14 +13,14 @@ public class BoxHandler {
 
     }
 
-    public dbBox GetBoxInfoByID(String BoxID)  {
+    public dbBox GetBoxInfoByID(String EntityID)  {
 
-        String _BoxID = BoxID.substring(0,36);
-        String _OrgID = BoxID.substring(37);
+        String _EntityID = EntityID.substring(0,36);
+        String _OrgID = EntityID.substring(37);
 
         String Query = "SELECT Box.id, P.firstName, P.lastName, P.email, created, accessed, expiration, FS.x, FS.y, Box.organizationID\n" +
                 "FROM [ffu].[dbo].[Box]\n" +
-                "LEFT OUTER JOIN [ffu].[dbo].[Freezer] FS on Box.id = FS.boxID\n" +
+                "LEFT OUTER JOIN [ffu].[dbo].[Freezer] FS on Box.id = FS.EntityID\n" +
                 "INNER JOIN [ffu].[dbo].[Persons] P on Box.owner = P.id\n" +
                 "WHERE Box.id = ? AND Box.organizationID = ?";
 
@@ -30,9 +30,9 @@ public class BoxHandler {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            System.out.println(BoxID.toString());
+            System.out.println(EntityID.toString());
 
-            stmt.setString(1, _BoxID);
+            stmt.setString(1, _EntityID);
             stmt.setString(2, _OrgID);
 
             ResultSet rs = stmt.executeQuery();
@@ -65,13 +65,13 @@ public class BoxHandler {
         }
     }
 
-    public int RetrieveBoxByID(String BoxID)  {
+    public int RetrieveBoxByID(String EntityID)  {
 
-        String _BoxID = BoxID.substring(0,36);
+        String _EntityID = EntityID.substring(0,36);
 
         String Query = "BEGIN TRY\n" +
                 "BEGIN TRANSACTION\n" +
-                "        UPDATE [ffu].[dbo].[Freezer] SET boxID = null WHERE boxID =?\n" +
+                "        UPDATE [ffu].[dbo].[Freezer] SET EntityID = null WHERE EntityID =?\n" +
                 "        UPDATE [ffu].[dbo].[Box] SET accessed = GETDATE() WHERE id =?\n" +
                 "COMMIT\n" +
                 "END TRY\n" +
@@ -84,8 +84,8 @@ public class BoxHandler {
 
             PreparedStatement stmt = con.prepareStatement(Query);
 
-            stmt.setString(1, _BoxID);
-            stmt.setString(2, _BoxID);
+            stmt.setString(1, _EntityID);
+            stmt.setString(2, _EntityID);
 
             return stmt.executeUpdate();
         }

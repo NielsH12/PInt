@@ -14,4 +14,10 @@ public class Entities {
         public Person owner;
         public int temperature;
     }
+    public static class Pizza {
+        public LocalDate expirationDate;
+        public String ingredients;
+        public boolean gluten;
+        public int baketime;
+    }
 }

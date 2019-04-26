@@ -7,10 +7,11 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class Guard {
-    private PolicyHandler policyHandler;
+    private PolicyHandler policyHandler = new PolicyHandler();
     private CapabilityHandler capabilityHandler = new CapabilityHandler();
     private IdentityServiceInterface identityService;
-    private static HashSet<String> publicActions = new HashSet<String>() {{
+
+    private static HashSet<String> rolePolicyFreeActions = new HashSet<String>() {{
         add("BoxDB/get");
         add("BoxDB/getID");
         add("BoxDB/findEmptySlot");
@@ -23,17 +24,19 @@ public class Guard {
         add("BoxDB/insert");
     }};
 
-    private static HashMap<String, HashSet<String>> entityPolicyRequiringActions = new HashMap<String, HashSet<String>>() {{
-        put("Sample", new HashSet<String>() {{
+    private static HashMap<String, HashSet> entityPolicyRequiringActions = new HashMap<String, HashSet>(){{
+        put("Person", new HashSet<String>(){{
         }});
-        put("Sample2", new HashSet<String>() {{
+        put("Sample", new HashSet<String>(){{
             add("Freezer/retrieve");
-            add("fiskeLars");
-            add("Freezer/insert");
-            add("BoxDB/retrieve");
-            add("BoxDB/insert");
+            add("Freezer/retrieve");
+        }});
+        put("Pizza", new HashSet<String>(){{
         }});
     }};
+
+
+
 
     Guard(IdentityServiceInterface identityService){
         this.identityService = identityService;
@@ -46,10 +49,8 @@ public class Guard {
         } catch (Exception e) {
             throw new WebApplicationException("Invalid User ID", Response.Status.BAD_REQUEST);
         }
-
         String role = identityService.getRole(userID, EntityID);
-
-        if(!publicActions.contains(action)){
+        if(!rolePolicyFreeActions.contains(action)){
             if(!policyHandler.roleAuthorize(role, action, QPmap)){
                 return null;
             }
@@ -63,8 +64,8 @@ public class Guard {
     }
 
     public boolean authorize(String UserID, String EntityID, UUID CapabilityID, String action, MultivaluedMap<String, String> QPmap){
-        // Role policies
-        if(!publicActions.contains(action)){
+        // Check role policy
+        if(!rolePolicyFreeActions.contains(action)){
             String role;
             try {
                 role = identityService.getRole(UUID.fromString(UserID), EntityID);
@@ -76,15 +77,15 @@ public class Guard {
             }
         }
 
-        // Entity policies
+        // Check entity policy
         String entityType = identityService.getEntityType(EntityID);
-        if(entityPolicyRequiringActions.get(entityType).contains(action)) {
-            if (!policyHandler.entityAuthorize(entityType, action, QPmap)) {
+        if(entityPolicyRequiringActions.get(entityType).contains(action)){
+            if(!policyHandler.entityAuthorize(entityType, action, QPmap)){
                 throw new WebApplicationException("Permission denied", Response.Status.FORBIDDEN);
             }
         }
 
-        // Capa
+        // Check capability
         if(capabilityRequiringActions.contains(action)){
             if(!capabilityHandler.authorize(UUID.fromString(UserID), EntityID, CapabilityID, action)){
                 throw new WebApplicationException("Invalid capability", Response.Status.FORBIDDEN);

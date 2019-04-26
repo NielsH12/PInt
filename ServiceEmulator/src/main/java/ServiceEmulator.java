@@ -48,10 +48,10 @@ public class ServiceEmulator {
 
     private static void getBoxInfoByID() throws IOException{
         System.out.println("Enter ID of the box");
-        String Boxid = br.readLine();
-        System.out.println(Boxid);
+        String EntityID = br.readLine();
+        System.out.println(EntityID);
 
-        if (!verifyBoxID(Boxid)){
+        if (!verifyEntityID(EntityID)){
             System.out.println("Not valid id");
             return;
         }
@@ -65,19 +65,19 @@ public class ServiceEmulator {
             return;
         }
 
-        String r = RestClient.getBoxInfoByID(UserID, Boxid);
+        String r = RestClient.getBoxInfoByID(UserID, EntityID);
         System.out.println(r);
     }
 
     private static void jensGet(){
         String UserID = "B6F64D8F-1916-4236-9BBA-039A380329AD";
-        String Boxid = "A70D717E-935E-4CA2-8192-22E65D84BF71@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
-        String r = RestClient.getBoxInfoByID(UserID, Boxid);
+        String EntityID = "A70D717E-935E-4CA2-8192-22E65D84BF71@1E3C9DBF-C004-4F93-B3BB-D1E45945D482";
+        String r = RestClient.getBoxInfoByID(UserID, EntityID);
         System.out.println(r);
     }
 
-    private static boolean verifyBoxID(String id){
-        System.out.println("verifyBoxID" + id.length());
+    private static boolean verifyEntityID(String id){
+        System.out.println("verifyEntityID" + id.length());
         return id.length() == 73;
     }
 
