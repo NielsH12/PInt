@@ -85,6 +85,7 @@ public class PolicyHandler {
 		}
 	}
 
+	//TODO: do we want this?
 	public String[] GetAllPoliciesForRole(String Role){
 		List<String> strings = new ArrayList<>();
 		newRolePolicyMapThatCanPrintCondition.get(Role).forEach((s, policy) -> strings.add(s + ": " + policy.conditionString));
@@ -92,18 +93,16 @@ public class PolicyHandler {
 		return strings.toArray(new String[0]);
 	}
 
+	//TODO: do we want this?
 	public String[] GetAllRolesWithAccessToAction(String Action){
 		List<String> strings = new ArrayList<>();
 		for (Map.Entry<String, HashMap<String, Policy>> map: newRolePolicyMapThatCanPrintCondition.entrySet()) {
-//			HashMap value = map.getValue();
 			for (Map.Entry<String, Policy> s: map.getValue().entrySet()){
 				if(Action.equals(s.getKey())){
 					strings.add(map.getKey() + ": " + s.getValue().conditionString);
 				}
 			}
-
 		}
-
 		return strings.toArray(new String[0]);
 	}
 
@@ -111,26 +110,27 @@ public class PolicyHandler {
 		boolean evaluate(MultivaluedMap<String, String> mMap);
 	}
 
+	// Class to handler printing condition
 	public class Policy{
 		String conditionString;
 		private Condition condition;
 		Policy(String conditionString, Condition condition){
 			this.conditionString = conditionString;
 			this.condition = condition;
-
 		}
-
 		boolean evaluate(MultivaluedMap<String, String> mMap){
 			return condition.evaluate(mMap);
 		}
 	}
 
+	//TODO: remove
 	@Test
 	public void test(){
 		for (String p : this.GetAllPoliciesForRole("Doctor")) {
 			System.out.println(p);
 		}
 	}
+	//TODO: remove
 	@Test
 	public void test2(){
 		for (String p : this.GetAllRolesWithAccessToAction("BoxDB/insert")) {
@@ -138,8 +138,7 @@ public class PolicyHandler {
 		}
 	}
 
-
-	private int CompareDates(LocalDate from, LocalDate to){
+	static public int CompareDates(LocalDate from, LocalDate to){
 		return (int) ChronoUnit.DAYS.between(from, to);
 	}
 }

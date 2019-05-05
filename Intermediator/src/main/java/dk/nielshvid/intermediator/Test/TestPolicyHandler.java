@@ -8,6 +8,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -98,6 +99,29 @@ public class TestPolicyHandler {
         Assert.assertFalse(actual);
     }
 
+    @Test
+    public void EntityAuthorize_WithLocalDateQPmap_AreEnforced() {
+        LocalDate localDate = LocalDate.now().minusDays(5);
+
+        String uuid = UUID.randomUUID().toString();
+        when(map.getFirst("SampleID")).thenReturn(uuid);
+
+        Entities.Sample sample = mock(Entities.Sample.class);
+        sample.accessed = localDate;
+
+        informationService = mock(InformationServiceInterface.class);
+        when(informationService.getSample(uuid)).thenReturn(sample);
+
+        // True exp
+        boolean actual = policyHandler.entityAuthorize("Sample", "TestDateCompare", map);
+        Assert.assertTrue(actual);
+
+        // False exp
+        sample.accessed = LocalDate.now();
+        actual = policyHandler.entityAuthorize("Sample", "TestDateCompare", map);
+        Assert.assertFalse(actual);
+    }
+
     private boolean testEntityAuthorizeWithInformationService(int wrongAnswer) {
         String uuid = UUID.randomUUID().toString();
         when(map.getFirst("SampleID")).thenReturn(uuid);
@@ -131,12 +155,14 @@ public class TestPolicyHandler {
         put("Student", new HashMap<String, PolicyHandler.Condition>(){{
         }});
     }};
+
     private HashMap<String, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<String, HashMap<String, PolicyHandler.Condition>>() {{
         put("Person", new HashMap<String, PolicyHandler.Condition>(){{
         }});
         put("Sample", new HashMap<String, PolicyHandler.Condition>(){{
             put("Freezer/insert", (map) -> (2 == 2));
             put("Freezer/retrieve", (map) -> (informationService.getSample(map.getFirst("SampleID")).temperature == 0));
+            put("TestDateCompare", (map) -> (1 < PolicyHandler.CompareDates(informationService.getSample(map.getFirst("SampleID")).accessed, LocalDate.now())));
         }});
         put("Pizza", new HashMap<String, PolicyHandler.Condition>(){{
         }});
