@@ -1,14 +1,18 @@
 package dk.nielshvid.intermediator;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import dk.nielshvid.intermediator.Entities.Sample;
+import javassist.compiler.ast.Visitor;
+
+import javax.xml.bind.annotation.XmlElement;
+import java.lang.invoke.SerializedLambda;
 
 
 public class TestHandler {
+        public static void main(String[] arg) {
 
 
-
-    public static void main(String[] arg) {
 
         String jsonData = "[{\"created\":\"Name1\",\"Age\":20},{\"Name\":\"Name2\",\"Age\":23},{\"Name\":\"Name3\",\"Age\":28}]";
 

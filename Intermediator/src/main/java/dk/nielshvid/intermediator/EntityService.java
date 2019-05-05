@@ -7,7 +7,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
-public class OracleClient {
+public class EntityService {
 
     private static Client client = ClientBuilder.newClient();
     private static Gson gson = new Gson();

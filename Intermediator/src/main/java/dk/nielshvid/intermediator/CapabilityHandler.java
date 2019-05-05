@@ -22,11 +22,10 @@ public class CapabilityHandler {
                 }});
             }});
         }});
-
     }};
 
 
-    public UUID addCapability(UUID userID, String EntityID, String key){
+    public UUID addCapability(String userID, String EntityID, String key){
 
         if(!treeTemplates.containsKey(key)){
             return null;
@@ -39,7 +38,7 @@ public class CapabilityHandler {
         return capability.ID;
     }
 
-    boolean authorize(UUID UserID, String EntityID, UUID CapabilityID, String action){
+    public boolean authorize(String UserID, String EntityID, UUID CapabilityID, String action){
         if(lastClean.plusHours(24).isBefore(LocalTime.now())){
             cleanCapabilities();
         }
@@ -71,10 +70,10 @@ public class CapabilityHandler {
         private LocalTime lastUsed;
         private Node<String> Actions;
         private UUID ID;
-        private UUID userID;
+        private String userID;
         private String EntityID;
 
-        Capability(UUID userID,  String EntityID, Node<String> Actions){
+        Capability(String userID,  String EntityID, Node<String> Actions){
             this.userID = userID;
             this.Actions = Actions;
             this.EntityID = EntityID;
@@ -95,7 +94,7 @@ public class CapabilityHandler {
             return false;
         }
 
-        boolean useAction(UUID UserID, String EntityID, String action){
+        boolean useAction(String UserID, String EntityID, String action){
             LocalTime temp = LocalTime.now();
 
             if(!UserID.equals(this.userID)){

@@ -1,5 +1,6 @@
 package dk.nielshvid.intermediator;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -8,9 +9,18 @@ import javax.ws.rs.core.UriInfo;
 import java.util.UUID;
 
 @Path("/")
-public class RestInterface{
-	private IdentityService identityService = new IdentityService();
-	private Guard guard = new Guard(identityService);
+public class APEI{
+	@Inject
+	IntermediatorClient fisk;
+
+	private Guard guard = new Guard();
+	private ForwardClient forwardClient = fisk;
+
+	public APEI(ForwardClient forwardClient){
+		if(forwardClient != null) {
+			this.forwardClient = forwardClient;
+		}
+	}
 
 	@Path("Freezer/insert")
 	@GET
@@ -21,11 +31,10 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "Freezer/insert", info.getQueryParameters())){
 			// Forward request
-			return IntermediatorClient.insertFreezer(UserID, EntityID, xPos, yPos);
+			return forwardClient.insertFreezer(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 
 	@Path("Freezer/retrieve")
@@ -37,7 +46,7 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "Freezer/retrieve", info.getQueryParameters())){
 			// Forward request
-			return IntermediatorClient.retrieveFreezer(UserID, EntityID, xPos, yPos);
+			return forwardClient.retrieveFreezer(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -55,7 +64,7 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/get", info.getQueryParameters())){
 			// Forward request
-			return Response.fromResponse(IntermediatorClient.getBoxDB(UserID, EntityID)).header("Capability", CapabilityID).build();
+			return Response.fromResponse(forwardClient.getBoxDB(UserID, EntityID)).header("Capability", CapabilityID).build();
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -71,7 +80,7 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/insert", info.getQueryParameters())){
 			// Forward request
-			return IntermediatorClient.insertBoxDB(UserID, EntityID, xPos, yPos);
+			return forwardClient.insertBoxDB(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -87,7 +96,7 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/retrieve", info.getQueryParameters())){
 			// Forward request
-			return IntermediatorClient.retrieveBoxDB(UserID, EntityID);
+			return forwardClient.retrieveBoxDB(UserID, EntityID);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -105,7 +114,7 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/findEmptySlot", info.getQueryParameters())){
 			// Forward request
-			return Response.fromResponse(IntermediatorClient.findEmptySlotBoxDB(UserID, EntityID)).header("Capability", CapabilityID).build();
+			return Response.fromResponse(forwardClient.findEmptySlotBoxDB(UserID, EntityID)).header("Capability", CapabilityID).build();
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -121,7 +130,7 @@ public class RestInterface{
 		// Check policies
 		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/getID", info.getQueryParameters())){
 			// Forward request
-			return IntermediatorClient.getIDBoxDB(UserID, EntityID, xPos, yPos);
+			return forwardClient.getIDBoxDB(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
