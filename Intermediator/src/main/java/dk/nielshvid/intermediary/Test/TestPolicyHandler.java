@@ -1,8 +1,8 @@
-package dk.nielshvid.intermediator.Test;
+package dk.nielshvid.intermediary.Test;
 
-import dk.nielshvid.intermediator.Entities;
-import dk.nielshvid.intermediator.InformationServiceInterface;
-import dk.nielshvid.intermediator.PolicyHandler;
+import dk.nielshvid.intermediary.Entities;
+import dk.nielshvid.intermediary.InformationServiceInterface;
+import dk.nielshvid.intermediary.PolicyHandler;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static dk.nielshvid.intermediary.Entities.EntityTypes.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,15 +22,14 @@ public class TestPolicyHandler {
     private MultivaluedMap<String, String> map;
 
     @BeforeMethod
-    public void setUp() {
-//        informationService = mock(InformationServiceInterface.class);
+    public void setup() {
         map = mock(MultivaluedMap.class);
-        policyHandler = new PolicyHandler(rolePolicyMap,entityPolicyMap, informationService);
+        policyHandler = new PolicyHandler(rolePolicyMap, entityPolicyMap, informationService);
     }
 
     // RoleAuthorize
     @Test
-    public void Role_without_ActionPermission_returnsFlase() {
+    public void Role_Without_ActionPermission_ReturnsFlase() {
         boolean actual = policyHandler.roleAuthorize("Decan", "Freezer/retrieve", null);
         Assert.assertFalse(actual);
 
@@ -47,6 +47,7 @@ public class TestPolicyHandler {
     public void Role_with_ActionPermission_And_MapWithAllowedQParametors_returnsTrue() {
         when(map.getFirst("xPos")).thenReturn("2");
         when(map.getFirst("yPos")).thenReturn("0");
+
         final boolean actual = policyHandler.roleAuthorize("Doctor", "BoxDB/insert", map);
         Assert.assertTrue(actual);
     }
@@ -69,7 +70,7 @@ public class TestPolicyHandler {
         boolean actual = policyHandler.entityAuthorize(null, null, null);
         Assert.assertFalse(actual);
 
-        actual = policyHandler.entityAuthorize("Sample", null, null);
+        actual = policyHandler.entityAuthorize(SAMPLE, null, null);
         Assert.assertFalse(actual);
 
         actual = policyHandler.entityAuthorize(null, "Freezer/insert", null);
@@ -79,7 +80,7 @@ public class TestPolicyHandler {
     @Test
     public void EntityAuthorize_WithAllwaysTrueExp_ReturnsTrue() {
         // allways true boolean exp
-        boolean actual = policyHandler.entityAuthorize("Sample", "Freezer/insert", map);
+        boolean actual = policyHandler.entityAuthorize(SAMPLE, "Freezer/insert", map);
         Assert.assertTrue(actual);
     }
 
@@ -113,12 +114,12 @@ public class TestPolicyHandler {
         when(informationService.getSample(uuid)).thenReturn(sample);
 
         // True exp
-        boolean actual = policyHandler.entityAuthorize("Sample", "TestDateCompare", map);
+        boolean actual = policyHandler.entityAuthorize(SAMPLE, "TestDateCompare", map);
         Assert.assertTrue(actual);
 
         // False exp
         sample.accessed = LocalDate.now();
-        actual = policyHandler.entityAuthorize("Sample", "TestDateCompare", map);
+        actual = policyHandler.entityAuthorize(SAMPLE, "TestDateCompare", map);
         Assert.assertFalse(actual);
     }
 
@@ -132,7 +133,7 @@ public class TestPolicyHandler {
         informationService = mock(InformationServiceInterface.class);
         when(informationService.getSample(uuid)).thenReturn(sample);
 
-        return policyHandler.entityAuthorize("Sample", "Freezer/retrieve", map);
+        return policyHandler.entityAuthorize(SAMPLE, "Freezer/retrieve", map);
     }
 
     private boolean setupQmap(String xPos, String yPos){
@@ -156,15 +157,15 @@ public class TestPolicyHandler {
         }});
     }};
 
-    private HashMap<String, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<String, HashMap<String, PolicyHandler.Condition>>() {{
-        put("Person", new HashMap<String, PolicyHandler.Condition>(){{
+    private HashMap<Entities.EntityTypes, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<Entities.EntityTypes, HashMap<String, PolicyHandler.Condition>>() {{
+        put(PERSON, new HashMap<String, PolicyHandler.Condition>(){{
         }});
-        put("Sample", new HashMap<String, PolicyHandler.Condition>(){{
+        put(SAMPLE, new HashMap<String, PolicyHandler.Condition>(){{
             put("Freezer/insert", (map) -> (2 == 2));
             put("Freezer/retrieve", (map) -> (informationService.getSample(map.getFirst("SampleID")).temperature == 0));
             put("TestDateCompare", (map) -> (1 < PolicyHandler.CompareDates(informationService.getSample(map.getFirst("SampleID")).accessed, LocalDate.now())));
         }});
-        put("Pizza", new HashMap<String, PolicyHandler.Condition>(){{
+        put(PIZZA, new HashMap<String, PolicyHandler.Condition>(){{
         }});
     }};
 }

@@ -1,4 +1,4 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 
 import com.google.gson.Gson;
 
@@ -8,6 +8,8 @@ import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.EmptyStackException;
 import java.util.UUID;
+
+import static dk.nielshvid.intermediary.Entities.EntityTypes.SAMPLE;
 
 public class InformationService implements InformationServiceInterface{
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
@@ -42,8 +44,8 @@ public class InformationService implements InformationServiceInterface{
     }
 
     @Override
-    public String getEntityType(String EntityID) {
-        return "Sample";
+    public Entities.EntityTypes getEntityType(String EntityID) {
+        return SAMPLE;
     }
 
     @Override

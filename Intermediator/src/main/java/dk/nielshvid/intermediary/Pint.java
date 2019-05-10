@@ -1,6 +1,7 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 
-import javax.inject.Inject;
+import com.google.gson.Gson;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -9,18 +10,44 @@ import javax.ws.rs.core.UriInfo;
 import java.util.UUID;
 
 @Path("/")
-public class APEI{
-	@Inject
-	IntermediatorClient fisk;
+public class Pint {
 
-	private Guard guard = new Guard();
-	private ForwardClient forwardClient = fisk;
 
-	public APEI(ForwardClient forwardClient){
-		if(forwardClient != null) {
-			this.forwardClient = forwardClient;
-		}
+//
+//	@Inject
+//	IntermediatorClient fisk;
+
+	private Shield shield = new Shield();
+	private ForwardClient forwardClient = new IntermediatorClient();
+//
+//	public Pint(ForwardClient forwardClient){
+//		if(forwardClient != null) {
+//			this.forwardClient = forwardClient;
+//		}
+//	}
+
+	@Path("Freezer/insert/{sample}")
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response jens (@PathParam("sample") String fisk){
+		System.out.println(fisk);
+		return null;
 	}
+
+    @Path("biostore/users")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response jensTest (String body){
+        Gson gson = new Gson();
+
+        Entities.Sample sample = gson.fromJson(body, Entities.Sample.class);
+//        Entities.Person person = gson.fromJson(body, Entities.Person.class);
+        System.out.println(sample);
+
+
+        return null;
+    }
+
 
 	@Path("Freezer/insert")
 	@GET
@@ -29,11 +56,10 @@ public class APEI{
 
 
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "Freezer/insert", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "Freezer/insert", info.getQueryParameters())){
 			// Forward request
 			return forwardClient.insertFreezer(UserID, EntityID, xPos, yPos);
 		};
-
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 	}
 
@@ -44,13 +70,12 @@ public class APEI{
 
 
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "Freezer/retrieve", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "Freezer/retrieve", info.getQueryParameters())){
 			// Forward request
 			return forwardClient.retrieveFreezer(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 
 	@Path("BoxDB/get")
@@ -59,16 +84,15 @@ public class APEI{
 	public Response getBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("EntityID") String EntityID){
 
 		// This structure can be optimized (maybe)
-		UUID CapabilityID = guard.generateCapability(UserID, EntityID, "BoxDB/get",info.getQueryParameters());
+		UUID CapabilityID = shield.generateCapability(UserID, EntityID, "BoxDB/get",info.getQueryParameters());
 
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/get", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "BoxDB/get", info.getQueryParameters())){
 			// Forward request
 			return Response.fromResponse(forwardClient.getBoxDB(UserID, EntityID)).header("Capability", CapabilityID).build();
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 
 	@Path("BoxDB/insert")
@@ -78,13 +102,12 @@ public class APEI{
 
 
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/insert", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "BoxDB/insert", info.getQueryParameters())){
 			// Forward request
 			return forwardClient.insertBoxDB(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 
 	@Path("BoxDB/retrieve")
@@ -94,13 +117,12 @@ public class APEI{
 
 
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/retrieve", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "BoxDB/retrieve", info.getQueryParameters())){
 			// Forward request
 			return forwardClient.retrieveBoxDB(UserID, EntityID);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 
 	@Path("BoxDB/findEmptySlot")
@@ -109,31 +131,27 @@ public class APEI{
 	public Response findEmptySlotBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("EntityID") String EntityID){
 
 		// This structure can be optimized (maybe)
-		UUID CapabilityID = guard.generateCapability(UserID, EntityID, "BoxDB/findEmptySlot",info.getQueryParameters());
+		UUID CapabilityID = shield.generateCapability(UserID, EntityID, "BoxDB/findEmptySlot",info.getQueryParameters());
 
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/findEmptySlot", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "BoxDB/findEmptySlot", info.getQueryParameters())){
 			// Forward request
 			return Response.fromResponse(forwardClient.findEmptySlotBoxDB(UserID, EntityID)).header("Capability", CapabilityID).build();
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 
 	@Path("BoxDB/getID")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getIDBoxDB (@Context UriInfo info, @QueryParam("UserID") String UserID, @QueryParam("Capability") UUID Capability, @QueryParam("EntityID") String EntityID, @QueryParam("xPos") int xPos, @QueryParam("yPos") int yPos){
-
-
 		// Check policies
-		if (guard.authorize(UserID, EntityID, Capability, "BoxDB/getID", info.getQueryParameters())){
+		if (shield.authorize(UserID, EntityID, Capability, "BoxDB/getID", info.getQueryParameters())){
 			// Forward request
 			return forwardClient.getIDBoxDB(UserID, EntityID, xPos, yPos);
 		};
 
 		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-
 	}
 }

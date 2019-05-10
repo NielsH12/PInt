@@ -1,15 +1,13 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
+
+import static dk.nielshvid.intermediary.Entities.EntityTypes.*;
 
 public class PolicyHandler {
 	private InformationServiceInterface informationService = new InformationService();
@@ -39,25 +37,25 @@ public class PolicyHandler {
 		}});
 		put("Fisk", new HashMap<String, Policy>(){{
 			put("BoxDB/insert", new Policy("1", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0))));
-			put("BoxDB/2", new Policy("2", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0))));
+			put("BoxDB/2", new Policy("xPos == 2 && ..", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0))));
 			put("BoxDB/3", new Policy("3", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0))));
 			put("BoxDB/4", new Policy("4", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0))));
 		}});
 	}};
 
-	private HashMap<String, HashMap<String, Condition>> entityPolicyMap = new HashMap<String, HashMap<String, Condition>>() {{
-		put("Person", new HashMap<String, Condition>(){{
+	private HashMap<Entities.EntityTypes, HashMap<String, Condition>> entityPolicyMap = new HashMap<Entities.EntityTypes, HashMap<String, Condition>>() {{
+		put(PERSON, new HashMap<String, Condition>(){{
 		}});
-		put("Sample", new HashMap<String, Condition>(){{
+		put(SAMPLE, new HashMap<String, Condition>(){{
 			put("Freezer/insert", (map) -> (2 == 2));
 			put("Freezer/retrieve", (map) -> (informationService.getSample(map.getFirst("SampleID")).owner.firstName.equals("niels")));
 		}});
-		put("Pizza", new HashMap<String, Condition>(){{
+		put(PIZZA, new HashMap<String, Condition>(){{
 		}});
 	}};
 
 	public PolicyHandler(){}
-	public PolicyHandler(HashMap<String, HashMap<String, Condition>> rolePolicyMap, HashMap<String, HashMap<String, Condition>> entityPolicyMap, InformationServiceInterface informationService){
+	public PolicyHandler(HashMap<String, HashMap<String, Condition>> rolePolicyMap, HashMap<Entities.EntityTypes, HashMap<String, Condition>> entityPolicyMap, InformationServiceInterface informationService){
 		if(rolePolicyMap != null){this.rolePolicyMap = rolePolicyMap;}
 		if(entityPolicyMap != null){this.entityPolicyMap = entityPolicyMap;}
 		if(informationService != null){this.informationService = informationService;}
@@ -74,13 +72,41 @@ public class PolicyHandler {
 		}
 	}
 
-	public boolean entityAuthorize(String Entity, String Action, MultivaluedMap<String, String> map) {
+	public boolean entityAuthorize(Entities.EntityTypes Entity, String Action, MultivaluedMap<String, String> map) {
 //		System.out.println("PolicyHandler.entityAuthorize()");
 		try {
 //			System.out.println(map.getFirst("ID"));
 			return entityPolicyMap.get(Entity).get(Action).evaluate(map);
 		} catch (Exception e) {
 			System.out.println("\t " + Entity + " is not allowed to perform action: " + Action);
+			return false;
+		}
+	}
+
+	public boolean entityAuthorizeByEntityType(String entityID, String action, Entities.EntityTypes entityType) {
+//		System.out.println("PolicyHandler.entityAuthorize()");
+		try {
+//			System.out.println(map.getFirst("ID"));
+
+			switch (entityType){
+				case SAMPLE : return informationService.getSample(entityID).evaluateByActionKey(action);
+				default: {
+					System.out.println("\t " + entityType + " is not a known Entity Type");
+					return false;
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("\t " + entityType + " is not allowed to perform action: " + action);
+			return false;
+		}
+	}
+
+	public boolean entityAuthorizeByEtity(String action, Entities.Entity entity) {
+//		System.out.println("PolicyHandler.entityAuthorize()");
+		try {
+			return entity.evaluateByActionKey(action);
+		} catch (Exception e) {
+			System.out.println("\t " + entity.getClass().getSimpleName() + " is not allowed to perform action: " + action);
 			return false;
 		}
 	}
@@ -110,10 +136,11 @@ public class PolicyHandler {
 		boolean evaluate(MultivaluedMap<String, String> mMap);
 	}
 
-	// Class to handler printing condition
+	// Class to handle printing condition
 	public class Policy{
 		String conditionString;
 		private Condition condition;
+
 		Policy(String conditionString, Condition condition){
 			this.conditionString = conditionString;
 			this.condition = condition;

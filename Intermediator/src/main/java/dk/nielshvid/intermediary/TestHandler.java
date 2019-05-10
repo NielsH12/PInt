@@ -1,35 +1,31 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import dk.nielshvid.intermediator.Entities.Sample;
-import javassist.compiler.ast.Visitor;
 
-import javax.xml.bind.annotation.XmlElement;
-import java.lang.invoke.SerializedLambda;
+import java.time.LocalDate;
 
 
 public class TestHandler {
         public static void main(String[] arg) {
 
+                Entities.Person person = new Entities.Person();
+                person.email = "hej@hej.dk";
+                person.lastName = "Andersen";
+                person.firstName = "Jens";
 
+                Entities.Sample sample2 = new Entities.Sample();
+                sample2.accessed = LocalDate.now();
+                sample2.temperature = 1;
+                sample2.expiration = LocalDate.now();
+                sample2.created = LocalDate.now();
+//                sample2.owner = person;
 
-        String jsonData = "[{\"created\":\"Name1\",\"Age\":20},{\"Name\":\"Name2\",\"Age\":23},{\"Name\":\"Name3\",\"Age\":28}]";
+                Gson gson = new Gson();
 
-        Gson gson = new Gson();
+                String test = gson.toJson(sample2);
 
+                System.out.println(test);
 
-        Sample test = new Sample();
-
-
-        test.temperature = 1;
-
-
-        String test3 = gson.toJson(test);
-
-        Sample nysample = gson.fromJson(test3, Sample.class);
-
-        System.out.println("hej");
 
 
 //
@@ -51,7 +47,7 @@ public class TestHandler {
 //        };
 //        Oracles oracales = new Oracles();
 //
-//        Guard guard = new Guard(identityService, oracales);
+//        Shield guard = new Shield(identityService, oracales);
 //
 //        List<String> fisk = new ArrayList<>();
 //        fisk.add("3");

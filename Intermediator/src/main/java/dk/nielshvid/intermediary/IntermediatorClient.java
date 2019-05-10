@@ -1,4 +1,4 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

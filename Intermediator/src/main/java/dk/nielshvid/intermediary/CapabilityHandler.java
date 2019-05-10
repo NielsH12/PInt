@@ -1,4 +1,4 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +24,26 @@ public class CapabilityHandler {
         }});
     }};
 
+    public CapabilityHandler(){}
+
+    public CapabilityHandler(String fisketest){
+        if (fisketest == "fisketest") {
+            treeTemplates = new HashMap<String, Node<String>>(){{
+                put("BoxDB/get", new Node<String>("BoxDB/get"){{
+                    addChild(new Node<String>("Freezer/retrieve"){{
+                        addChild(new Node<String>("BoxDB/retrieve"){{
+                        }});
+                    }});
+                }});
+                put("BoxDB/findEmptySlot", new Node<String>("BoxDB/findEmptySlot"){{
+                    addChild(new Node<String>("Freezer/insert"){{
+                        addChild(new Node<String>("BoxDB/insert"){{
+                        }});
+                    }});
+                }});
+            }};
+        }
+    }
 
     public UUID addCapability(String userID, String EntityID, String key){
 
@@ -64,7 +84,6 @@ public class CapabilityHandler {
             }
         }
     }
-
 
     private class Capability {
         private LocalTime lastUsed;

@@ -1,7 +1,7 @@
-package dk.nielshvid.intermediator;
+package dk.nielshvid.intermediary;
 
 import com.google.gson.Gson;
-import dk.nielshvid.intermediator.Entities.*;
+import dk.nielshvid.intermediary.Entities.*;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
