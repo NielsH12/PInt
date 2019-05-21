@@ -21,18 +21,19 @@ public class Shield {
         add("BoxDB/insert");
     }};
 
-    private static HashMap<Entities.EntityTypes, HashSet> entityPolicyRequiringActions = new HashMap<Entities.EntityTypes, HashSet>(){{
-        put(Entities.EntityTypes.PERSON, new HashSet<String>(){{
+    private static HashMap<Entities.EntityType, HashSet> entityPolicyRequiringActions = new HashMap<Entities.EntityType, HashSet>(){{
+        put(Entities.EntityType.PERSON, new HashSet<String>(){{
+
         }});
-        put(Entities.EntityTypes.SAMPLE, new HashSet<String>(){{
+        put(Entities.EntityType.SAMPLE, new HashSet<String>(){{
         }});
-        put(Entities.EntityTypes.PIZZA, new HashSet<String>(){{
+        put(Entities.EntityType.PIZZA, new HashSet<String>(){{
         }});
     }};
 
     public Shield(){}
     public Shield(InformationServiceInterface informationService, HashSet<String> rolePolicyFreeActions,
-                  HashSet<String> capabilityRequiringActions, HashMap<Entities.EntityTypes, HashSet> entityPolicyRequiringActions,
+                  HashSet<String> capabilityRequiringActions, HashMap<Entities.EntityType, HashSet> entityPolicyRequiringActions,
                   PolicyHandler policyHandler, CapabilityHandler capabilityHandler){
         if(informationService != null){this.informationService = informationService;}
         if(rolePolicyFreeActions != null){
@@ -117,6 +118,7 @@ public class Shield {
             } catch (Exception e){
                 throw new WebApplicationException("Invalid User ID", Response.Status.BAD_REQUEST);
             }
+            //TODO: body/entity bliver ikke brut i checket!!!
             if(!policyHandler.roleAuthorize(role, action, QPmap)){
                 throw new WebApplicationException("RP: Permission denied", Response.Status.FORBIDDEN);
             }
@@ -126,7 +128,7 @@ public class Shield {
     // typen kender man nok???
     private void entityPolicyCheckWithQPmap(String action, String EntityID, MultivaluedMap<String, String> QPmap){
         // Check entity policy
-        Entities.EntityTypes entityType = informationService.getEntityType(EntityID);
+        Entities.EntityType entityType = informationService.getEntityType(EntityID);
         if(entityPolicyRequiringActions.get(entityType).contains(action)){
             if(!policyHandler.entityAuthorize(entityType, action, QPmap)){
                 throw new WebApplicationException("EP: Permission denied", Response.Status.FORBIDDEN);
@@ -137,7 +139,7 @@ public class Shield {
     // typen kender man nok???
     private void entityPolicyCheckWithEntityID(String action, String EntityID){
         // Check entity policy
-        Entities.EntityTypes entityType = informationService.getEntityType(EntityID);
+        Entities.EntityType entityType = informationService.getEntityType(EntityID);
         if(entityPolicyRequiringActions.get(entityType).contains(action)){
             if(!policyHandler.entityAuthorizeByEntityType(EntityID, action, entityType)){
                 throw new WebApplicationException("EP: Permission denied", Response.Status.FORBIDDEN);

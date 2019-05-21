@@ -1,24 +1,28 @@
 package dk.nielshvid.intermediary;
 
+import org.json.JSONObject;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import java.time.LocalDate;
 import java.util.*;
 import java.time.temporal.ChronoUnit;
 
-import static dk.nielshvid.intermediary.Entities.EntityTypes.*;
+import static dk.nielshvid.intermediary.Entities.EntityType.*;
 
 public class PolicyHandler {
 	private InformationServiceInterface informationService = new InformationService();
 
 	private HashMap<String, HashMap<String, Condition>> rolePolicyMap = new HashMap<String, HashMap<String, Condition>>() {{
 		put("Decan", new HashMap<String, Condition>(){{
+			put("Freezer/retrieve", map -> (Integer.parseInt(map.getFirst("xPos")) + Integer.parseInt(map.getFirst("yPos")) == 10));
 		}});
 		put("Doctor", new HashMap<String, Condition>(){{
 			put("Freezer/retrieve", map -> true);
 			put("Freezer/insert", map -> true);
-			put("BoxDB/retrieve", map -> (1 <= 2));
+			put("BoxDB/retrieve", map -> (3 <= 2));
 			put("BoxDB/insert", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0)));
 		}});
 		put("Assistant", new HashMap<String, Condition>(){{
@@ -43,7 +47,7 @@ public class PolicyHandler {
 		}});
 	}};
 
-	private HashMap<Entities.EntityTypes, HashMap<String, Condition>> entityPolicyMap = new HashMap<Entities.EntityTypes, HashMap<String, Condition>>() {{
+	private HashMap<Entities.EntityType, HashMap<String, Condition>> entityPolicyMap = new HashMap<Entities.EntityType, HashMap<String, Condition>>() {{
 		put(PERSON, new HashMap<String, Condition>(){{
 		}});
 		put(SAMPLE, new HashMap<String, Condition>(){{
@@ -55,7 +59,7 @@ public class PolicyHandler {
 	}};
 
 	public PolicyHandler(){}
-	public PolicyHandler(HashMap<String, HashMap<String, Condition>> rolePolicyMap, HashMap<Entities.EntityTypes, HashMap<String, Condition>> entityPolicyMap, InformationServiceInterface informationService){
+	public PolicyHandler(HashMap<String, HashMap<String, Condition>> rolePolicyMap, HashMap<Entities.EntityType, HashMap<String, Condition>> entityPolicyMap, InformationServiceInterface informationService){
 		if(rolePolicyMap != null){this.rolePolicyMap = rolePolicyMap;}
 		if(entityPolicyMap != null){this.entityPolicyMap = entityPolicyMap;}
 		if(informationService != null){this.informationService = informationService;}
@@ -72,7 +76,7 @@ public class PolicyHandler {
 		}
 	}
 
-	public boolean entityAuthorize(Entities.EntityTypes Entity, String Action, MultivaluedMap<String, String> map) {
+	public boolean entityAuthorize(Entities.EntityType Entity, String Action, MultivaluedMap<String, String> map) {
 //		System.out.println("PolicyHandler.entityAuthorize()");
 		try {
 //			System.out.println(map.getFirst("ID"));
@@ -83,7 +87,7 @@ public class PolicyHandler {
 		}
 	}
 
-	public boolean entityAuthorizeByEntityType(String entityID, String action, Entities.EntityTypes entityType) {
+	public boolean entityAuthorizeByEntityType(String entityID, String action, Entities.EntityType entityType) {
 //		System.out.println("PolicyHandler.entityAuthorize()");
 		try {
 //			System.out.println(map.getFirst("ID"));
@@ -136,6 +140,13 @@ public class PolicyHandler {
 		boolean evaluate(MultivaluedMap<String, String> mMap);
 	}
 
+	//TODO: vi kører med JSONObject!!!
+	//TODO: se evt. TestMain
+    public interface Condition2 {
+
+        boolean evaluate(MultivaluedMap<String, String> mMap, JSONObject jsonObject);
+    }
+
 	// Class to handle printing condition
 	public class Policy{
 		String conditionString;
@@ -153,9 +164,9 @@ public class PolicyHandler {
 	//TODO: remove
 	@Test
 	public void test(){
-		for (String p : this.GetAllPoliciesForRole("Doctor")) {
-			System.out.println(p);
-		}
+//		for (String p : this.GetAllPoliciesForRole("Doctor")) {
+//			System.out.println(p);
+//		}
 	}
 	//TODO: remove
 	@Test
@@ -168,4 +179,22 @@ public class PolicyHandler {
 	static public int CompareDates(LocalDate from, LocalDate to){
 		return (int) ChronoUnit.DAYS.between(from, to);
 	}
+
+    // !!! dur ikke :(
+    // forsøg med body : kan ikke lade sig gøre da Condition2 kan være mange entites og derved kan de ikke bruges i lamda.
+    private HashMap<String, HashMap<String, Condition2>> rolePolicyMap3 = new HashMap<String, HashMap<String, Condition2>>() {{
+        put("Decan", new HashMap<String, Condition2>(){{
+            put("Freezer/retrieve", (map, body) -> (Integer.parseInt(map.getFirst("xPos")) + Integer.parseInt(map.getFirst("yPos")) == 10));
+        }});
+        put("Doctor", new HashMap<String, Condition2>(){{
+            put("Freezer/retrieve", (map, body) -> true);
+            put("Freezer/insert", (map, body) -> true);
+            put("BoxDB/retrieve", (map, body) -> (1 <= 2));
+            put("BoxDB/insert", (map, body) -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0)));
+        }});
+        put("Assistant", new HashMap<String, Condition2>(){{
+        }});
+        put("Student", new HashMap<String, Condition2>(){{
+        }});
+    }};
 }

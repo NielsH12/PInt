@@ -1,15 +1,21 @@
 package dk.nielshvid.intermediary;
 
 import com.google.gson.Gson;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.EmptyStackException;
 import java.util.UUID;
 
-import static dk.nielshvid.intermediary.Entities.EntityTypes.SAMPLE;
+import static dk.nielshvid.intermediary.Entities.EntityType.SAMPLE;
 
 public class InformationService implements InformationServiceInterface{
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
@@ -44,7 +50,7 @@ public class InformationService implements InformationServiceInterface{
     }
 
     @Override
-    public Entities.EntityTypes getEntityType(String EntityID) {
+    public Entities.EntityType getEntityType(String EntityID) {
         return SAMPLE;
     }
 
@@ -163,5 +169,139 @@ public class InformationService implements InformationServiceInterface{
         } catch (Exception e){
             System.out.println("Got caught on first try-catch (Connection error)");
         }
+    }
+
+    @Test
+    public void getRoleFromFFU(){
+        String UserID = "userDB:4874f6893b22609d8b00c98223299a9b";
+        String LogicalSetID = "4874f6893b22609d8b00c9822329c253";
+        String authenticateBody = "{\n" +
+                "\"username\":\"sJespersen\",\n" +
+                "\"password\": \"sJespersen$FFU\"\n" +
+                "}\n";
+
+        Response authenticate = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/authenticate/login")
+                .request()
+                .header("Content-Type", "application/json")
+                .post(Entity.json(authenticateBody));
+        String output = authenticate.readEntity(String.class);
+        System.out.println(output);
+        final Cookie sessionId = authenticate.getCookies().get("connect.sid");
+
+
+        Response response = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/logicalsets/"+ LogicalSetID)
+                .request()
+                .cookie(sessionId)
+                .get();
+
+        output = response.readEntity(String.class);
+
+        JSONObject jsonOb = null;
+        try {
+            jsonOb = new JSONObject(output);
+            JSONArray owners = jsonOb.getJSONArray("owners");
+
+            // find the group of the owner of the entity
+            String groupID = findGroupID(sessionId, UserID);
+
+            // find the groups that the user is a member of
+            JSONArray roleinGroups = findUserGroups(sessionId, UserID);
+
+            int i = 0;
+            while (i < owners.length()) {
+                if(roleinGroups.getJSONObject(i).getString("group").equals(groupID)){
+                    String roleID = roleinGroups.getJSONObject(i).getString("groupRole");
+                    System.out.println("IT IS A MATCH");
+                    System.out.println("USERS ROLEID IS: " + roleID);
+
+                    String roleName = getRole(sessionId, roleID);
+                    System.out.println("USERS ROLENAME IS: " + roleName);
+                }
+                i++;
+            }
+
+            System.out.println(jsonOb);
+            System.out.println(owners);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(output);
+        client.close();
+    }
+
+    private String getRole(Cookie sessionId, String roleID){
+        Response response = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/roles/"+ roleID)
+                .request()
+                .cookie(sessionId)
+                .get();
+        String output = response.readEntity(String.class);
+
+        JSONObject jsonOb = null;
+        String role = null;
+        try {
+            jsonOb = new JSONObject(output);
+            role = jsonOb.getString("name");
+
+            System.out.println(role);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return role;
+    }
+
+    private String findGroupID(Cookie sessionId, String UserID){
+        Response response = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/users/"+ UserID)
+                .request()
+                .cookie(sessionId)
+                .get();
+        String output = response.readEntity(String.class);
+
+        JSONObject jsonOb = null;
+        String groupID = null;
+        try {
+            jsonOb = new JSONObject(output);
+            JSONArray roleInGroup = jsonOb.getJSONArray("roleInGroup");
+            JSONObject groupAndGroupRole = roleInGroup.getJSONObject(0);
+            groupID = groupAndGroupRole.get("group").toString();
+
+            System.out.println(groupID);
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return groupID;
+    }
+
+    private JSONArray findUserGroups(Cookie sessionId, String UserID){
+        Response response = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/users/"+ UserID)
+                .request()
+                .cookie(sessionId)
+                .get();
+        String output = response.readEntity(String.class);
+
+        JSONObject jsonOb = null;
+        JSONArray roleInGroup = null;
+        try {
+            jsonOb = new JSONObject(output);
+            roleInGroup = jsonOb.getJSONArray("roleInGroup");
+
+
+            System.out.println(roleInGroup);
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return roleInGroup;
     }
 }

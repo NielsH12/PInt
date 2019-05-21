@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 //TODO: comapre dates er ikke med i dennne klasse
 public class Entities {
-    public enum EntityTypes {
+    public enum EntityType {
         SAMPLE,
         PERSON,
         PIZZA,
@@ -63,6 +63,17 @@ public class Entities {
             }
             return false;
         }
+
+        //TODO: det her er mit bedste bud ind til videre
+//        public MultivaluedMap<String, String> returnAsMap(){
+//            MultivaluedMap<String, String> multivaluedMap = new MultivaluedHashMap<>();
+//            multivaluedMap.add("created", this.created.toString());
+//            multivaluedMap.add("accessed", this.accessed.toString());
+//            multivaluedMap.add("expiration", this.expiration.toString());
+//            multivaluedMap.add("temperature", Integer.toString(this.temperature));
+////            this.owner.returnAsMap().forEach((String key, List<String> list)-> { ... });
+//            return multivaluedMap;
+////        }
 
         private final HashMap<String, SampleEvaluate> entityPolicyMap = new HashMap<String, SampleEvaluate>() {{
             put("Freezer/insert", (sample) -> sample.evaluate(sample1 -> sample1.temperature == 1));

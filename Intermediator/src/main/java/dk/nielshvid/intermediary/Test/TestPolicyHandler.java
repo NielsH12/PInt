@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static dk.nielshvid.intermediary.Entities.EntityTypes.*;
+import static dk.nielshvid.intermediary.Entities.EntityType.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -157,7 +157,7 @@ public class TestPolicyHandler {
         }});
     }};
 
-    private HashMap<Entities.EntityTypes, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<Entities.EntityTypes, HashMap<String, PolicyHandler.Condition>>() {{
+    private HashMap<Entities.EntityType, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<Entities.EntityType, HashMap<String, PolicyHandler.Condition>>() {{
         put(PERSON, new HashMap<String, PolicyHandler.Condition>(){{
         }});
         put(SAMPLE, new HashMap<String, PolicyHandler.Condition>(){{

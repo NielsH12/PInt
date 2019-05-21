@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
-import static dk.nielshvid.intermediary.Entities.EntityTypes.ENTITY_TYPES_WITH_NOTHING_FOR_TESTING;
-import static dk.nielshvid.intermediary.Entities.EntityTypes.SAMPLE;
+import static dk.nielshvid.intermediary.Entities.EntityType.ENTITY_TYPES_WITH_NOTHING_FOR_TESTING;
+import static dk.nielshvid.intermediary.Entities.EntityType.SAMPLE;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,24 +24,23 @@ import static org.mockito.Mockito.when;
 
 public class TestShield {
     private Shield shield;
-    private String keyInRolePolicyFreeActions = "KeyInRolePolicyFreeActions";
-    private String keyNotInRolePolicyFreeActions = "keyNotInRolePolicyFreeActions";
-    private String RoleWithPolicy = "RoleWithPolicy";
-    private String ImplementedAction = "ImplementedAction";
-    private String ImplementedActionWithBoolExp = "ImplementedActionWithBoolExp";
-    private String ImplementedActionWithFalseBoolExp = "ImplementedActionWithFalseBoolExp";
-    private String ActionWithEntityPolicy = "ActionWithEntityPolicy";
-    private String EntityWithNoPolicies = "EntityWithNoPolicies";
-    private String ActionEnforcedByCapOnly = "ActionEnforcedByCapOnly";
+    private static String KeyInRolePolicyFreeActions = "KeyInRolePolicyFreeActions";
+    private static String keyNotInRolePolicyFreeActions = "keyNotInRolePolicyFreeActions";
+    private static String RoleWithPolicy = "RoleWithPolicy";
+    private static String ImplementedAction = "ImplementedAction";
+    private static String ImplementedActionWithBoolExp = "ImplementedActionWithBoolExp";
+    private static String ImplementedActionWithFalseBoolExp = "ImplementedActionWithFalseBoolExp";
+    private static String ActionWithEntityPolicy = "ActionWithEntityPolicy";
+    private static String EntityWithNoPolicies = "EntityWithNoPolicies";
+    private static String ActionEnforcedByCapOnly = "ActionEnforcedByCapOnly";
     private InformationServiceInterface informationService;
-    private UUID expectedUUID = UUID.randomUUID();
-    private UUID ValidCapaID = UUID.randomUUID();
+    private static UUID expectedUUID = UUID.randomUUID();
+    private static UUID ValidCapaID = UUID.randomUUID();
+    private static String UserID = "userID";
+    private static String EntityID = "entityID";
 
     @BeforeMethod
     public void setUp() {
-        String UserID = "userID";
-        String EntityID = "entityID";
-
         informationService = mock(InformationServiceInterface.class);
         when(informationService.getRole(UserID, EntityID)).thenReturn(RoleWithPolicy);
         when(informationService.getEntityType(EntityWithNoPolicies)).thenReturn(ENTITY_TYPES_WITH_NOTHING_FOR_TESTING);
@@ -58,7 +57,7 @@ public class TestShield {
     //rolePolicyFreeActions
     @Test
     public void Action_in_rolePolicyFreeActions_ReturnsTrue() {
-        final boolean actual = shield.authorize(null, EntityWithNoPolicies, null, keyInRolePolicyFreeActions, null);
+        final boolean actual = shield.authorize(null, EntityWithNoPolicies, null, KeyInRolePolicyFreeActions, null);
         //
         Assert.assertTrue(actual);
     }
@@ -105,37 +104,34 @@ public class TestShield {
     // CapabilityPolicies
     @Test
     public void GenerateCapability_returns_UUID_WhenNoPolicyIsBlocking() {
-        UUID actual = shield.generateCapability("userID", "entityID", keyInRolePolicyFreeActions, null);
+        UUID actual = shield.generateCapability(UserID, EntityID, KeyInRolePolicyFreeActions, null);
         Assert.assertEquals(actual, expectedUUID);
     }
 
     @Test
     public void GenerateCapability_Are_Enforced_By_Policies() {
         // fail rolePolicy
-        UUID expectedNull = shield.generateCapability("userID", "entityID", keyNotInRolePolicyFreeActions, null);
+        UUID expectedNull = shield.generateCapability(UserID, EntityID, keyNotInRolePolicyFreeActions, null);
         Assert.assertNull(expectedNull);
 
         // pass rolePolicy
-        UUID actual = shield.generateCapability("userID", "entityID", ImplementedActionWithBoolExp, null);
+        UUID actual = shield.generateCapability(UserID, EntityID, ImplementedActionWithBoolExp, null);
         Assert.assertEquals(actual, expectedUUID);
     }
 
     @Test(expectedExceptions = {WebApplicationException.class}, expectedExceptionsMessageRegExp = "CP: Invalid capability")
     public void capabilityPoliciesAreEnforced_WithWrongCapabilityID_ThrowException() {
-        shield.authorize("userID", EntityWithNoPolicies, null, ActionEnforcedByCapOnly, null);
+        shield.authorize(UserID, EntityWithNoPolicies, null, ActionEnforcedByCapOnly, null);
     }
 
     @Test
     public void capabilityPoliciesAreEnforced_WithRightCapabilityID_ReturnsTrue() {
-        final boolean actual = shield.authorize("userID", EntityWithNoPolicies, ValidCapaID, ActionEnforcedByCapOnly, null);
+        final boolean actual = shield.authorize(UserID, EntityWithNoPolicies, ValidCapaID, ActionEnforcedByCapOnly, null);
         Assert.assertTrue(actual);
     }
 
 
     private boolean testShieldRoleAuthorize(String implementedAction, String returnRole) {
-        String UserID = "userID";
-        String EntityID = "entityID";
-
         when(informationService.getRole(UserID, EntityID)).thenReturn(returnRole);
         when(informationService.getEntityType(EntityID)).thenReturn(SAMPLE);
 
@@ -143,13 +139,11 @@ public class TestShield {
     }
 
     private boolean testShieldEntityAuthorize(String implementedAction, String returnRole, int temperature) {
-        String UserID = "userID";
-        String EntityID = "entityID";
         MultivaluedMap<String, String> mockedMap = mock(MultivaluedMap.class);
         when(mockedMap.getFirst("ID")).thenReturn(EntityID);
 
         when(informationService.getRole(UserID, EntityID)).thenReturn(returnRole);
-        when(informationService.getEntityType(EntityID)).thenReturn(Entities.EntityTypes.SAMPLE);
+        when(informationService.getEntityType(EntityID)).thenReturn(Entities.EntityType.SAMPLE);
 
         Entities.Sample sample = new Entities.Sample();
         sample.temperature = temperature;
@@ -166,7 +160,7 @@ public class TestShield {
 //    }
 
     private HashSet<String> rolePolicyFreeActions = new HashSet<String>() {{
-        add(keyInRolePolicyFreeActions);
+        add(KeyInRolePolicyFreeActions);
         add(ActionEnforcedByCapOnly);
     }};
 
@@ -179,14 +173,14 @@ public class TestShield {
         }});
     }};
 
-    private HashMap<Entities.EntityTypes, HashSet> entityPolicyRequiringActions = new HashMap<Entities.EntityTypes, HashSet>(){{
+    private HashMap<Entities.EntityType, HashSet> entityPolicyRequiringActions = new HashMap<Entities.EntityType, HashSet>(){{
         put(SAMPLE, new HashSet<String>(){{
             add(ActionWithEntityPolicy);
         }});
         put(ENTITY_TYPES_WITH_NOTHING_FOR_TESTING, new HashSet<String>(){{}});
     }};
 
-    private HashMap<Entities.EntityTypes, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<Entities.EntityTypes, HashMap<String, PolicyHandler.Condition>>() {{
+    private HashMap<Entities.EntityType, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<Entities.EntityType, HashMap<String, PolicyHandler.Condition>>() {{
         put(SAMPLE, new HashMap<String, PolicyHandler.Condition>(){{
             put(ActionWithEntityPolicy, (map) -> (informationService.getSample(map.getFirst("ID")).temperature < 0));
         }});

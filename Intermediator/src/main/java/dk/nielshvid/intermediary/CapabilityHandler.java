@@ -9,7 +9,7 @@ public class CapabilityHandler {
     private static HashMap<UUID, Capability> capabilities = new HashMap<>();
     private static LocalTime lastClean = LocalTime.now();
     private static final int CAPABILITY_LIFETIME_SECONDS = 300;
-    private HashMap<String, Node<String>> treeTemplates = new HashMap<String, Node<String>>(){{
+    private HashMap<String, Node<String>> capabilityTemplates = new HashMap<String, Node<String>>(){{
         put("BoxDB/get", new Node<String>("BoxDB/get"){{
             addChild(new Node<String>("Freezer/retrieve"){{
                 addChild(new Node<String>("BoxDB/retrieve"){{
@@ -28,7 +28,7 @@ public class CapabilityHandler {
 
     public CapabilityHandler(String fisketest){
         if (fisketest == "fisketest") {
-            treeTemplates = new HashMap<String, Node<String>>(){{
+            capabilityTemplates = new HashMap<String, Node<String>>(){{
                 put("BoxDB/get", new Node<String>("BoxDB/get"){{
                     addChild(new Node<String>("Freezer/retrieve"){{
                         addChild(new Node<String>("BoxDB/retrieve"){{
@@ -47,13 +47,13 @@ public class CapabilityHandler {
 
     public UUID addCapability(String userID, String EntityID, String key){
 
-        if(!treeTemplates.containsKey(key)){
+        if(!capabilityTemplates.containsKey(key)){
             return null;
         }
 
-        Node<String> treeTemplate = treeTemplates.get(key);
+        Node<String> capabilityTemplate = capabilityTemplates.get(key);
 
-        Capability capability = new Capability(userID, EntityID, treeTemplate);
+        Capability capability = new Capability(userID, EntityID, capabilityTemplate);
         capabilities.put(capability.getID(), capability);
         return capability.ID;
     }
@@ -67,7 +67,7 @@ public class CapabilityHandler {
             return false;
         }
 
-        boolean result =  capabilities.get(CapabilityID).useAction(UserID, EntityID, action);
+        boolean result =  capabilities.get(CapabilityID).useResource(UserID, EntityID, action);
         if(capabilities.get(CapabilityID).delete()){
             capabilities.remove(CapabilityID);
         }
@@ -113,7 +113,7 @@ public class CapabilityHandler {
             return false;
         }
 
-        boolean useAction(String UserID, String EntityID, String action){
+        boolean useResource(String UserID, String EntityID, String action){
             LocalTime temp = LocalTime.now();
 
             if(!UserID.equals(this.userID)){
