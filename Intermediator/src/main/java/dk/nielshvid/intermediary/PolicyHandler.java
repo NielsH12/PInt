@@ -15,21 +15,21 @@ import static dk.nielshvid.intermediary.Entities.EntityType.*;
 public class PolicyHandler {
 	private InformationServiceInterface informationService = new InformationService();
 
-	private HashMap<String, HashMap<String, Condition>> rolePolicyMap = new HashMap<String, HashMap<String, Condition>>() {{
-		put("Decan", new HashMap<String, Condition>(){{
-			put("Freezer/retrieve", map -> (Integer.parseInt(map.getFirst("xPos")) + Integer.parseInt(map.getFirst("yPos")) == 10));
-		}});
-		put("Doctor", new HashMap<String, Condition>(){{
-			put("Freezer/retrieve", map -> true);
-			put("Freezer/insert", map -> true);
-			put("BoxDB/retrieve", map -> (3 <= 2));
-			put("BoxDB/insert", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0)));
-		}});
-		put("Assistant", new HashMap<String, Condition>(){{
-		}});
-		put("Student", new HashMap<String, Condition>(){{
-		}});
-	}};
+//	private HashMap<String, HashMap<String, Condition>> rolePolicyMap = new HashMap<String, HashMap<String, Condition>>() {{
+//		put("Decan", new HashMap<String, Condition>(){{
+//			put("Freezer/retrieve", map -> (Integer.parseInt(map.getFirst("xPos")) + Integer.parseInt(map.getFirst("yPos")) == 10));
+//		}});
+//		put("Doctor", new HashMap<String, Condition>(){{
+//			put("Freezer/retrieve", map -> true);
+//			put("Freezer/insert", map -> true);
+//			put("BoxDB/retrieve", map -> (3 <= 2));
+//			put("BoxDB/insert", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0)));
+//		}});
+//		put("Assistant", new HashMap<String, Condition>(){{
+//		}});
+//		put("Student", new HashMap<String, Condition>(){{
+//		}});
+//	}};
 
 	// Jens Idea
 	private HashMap<String, HashMap<String, Policy>> newRolePolicyMapThatCanPrintCondition = new HashMap<String, HashMap<String, Policy>>() {{
@@ -59,17 +59,17 @@ public class PolicyHandler {
 	}};
 
 	public PolicyHandler(){}
-	public PolicyHandler(HashMap<String, HashMap<String, Condition>> rolePolicyMap, HashMap<Entities.EntityType, HashMap<String, Condition>> entityPolicyMap, InformationServiceInterface informationService){
-		if(rolePolicyMap != null){this.rolePolicyMap = rolePolicyMap;}
+	public PolicyHandler(HashMap<String, HashMap<String, Condition2>> rolePolicyMap, HashMap<Entities.EntityType, HashMap<String, Condition>> entityPolicyMap, InformationServiceInterface informationService){
+		if(rolePolicyMap != null){this.rolePolicyMap3 = rolePolicyMap;}
 		if(entityPolicyMap != null){this.entityPolicyMap = entityPolicyMap;}
 		if(informationService != null){this.informationService = informationService;}
 	}
 
-	public boolean roleAuthorize(String Role, String Action, MultivaluedMap<String, String> map) {
+	public boolean roleAuthorize(String Role, String Action, MultivaluedMap<String, String> map, JSONObject body) {
 //		System.out.println("PolicyHandler.roleAuthorize()");
 		try {
 			//System.out.println("\t Authorize");
-			return rolePolicyMap.get(Role).get(Action).evaluate(map);
+			return rolePolicyMap3.get(Role).get(Action).evaluate(map, body);
 		} catch (Exception e) {
 			System.out.println("\t " + Role + " is not allowed to perform action: " + Action);
 			return false;

@@ -173,8 +173,16 @@ public class InformationService implements InformationServiceInterface{
 
     @Test
     public void getRoleFromFFU(){
-        String UserID = "userDB:4874f6893b22609d8b00c98223299a9b";
-        String LogicalSetID = "4874f6893b22609d8b00c9822329c253";
+//        String UserID = "userDB:4874f6893b22609d8b00c98223299a9b";
+//        String LogicalSetID = "4874f6893b22609d8b00c9822329c253"; // matches with UserID
+//        String LogicalSetID = "4874f6893b22609d8b00c982232aa772"; // does NOT match with userID
+
+//        String UserID = "userDB:0d403b82b42785881e0aff5c2800de7a";
+//        String LogicalSetID = "325b1b331f5b8b0dbc8ddc81fa019be0";
+
+        String UserID = "userDB:fc672cb8b8901cc7c2e6c2ef83008bb7";
+        String LogicalSetID = "fc672cb8b8901cc7c2e6c2ef83009ba5";
+
         String authenticateBody = "{\n" +
                 "\"username\":\"sJespersen\",\n" +
                 "\"password\": \"sJespersen$FFU\"\n" +
@@ -201,16 +209,20 @@ public class InformationService implements InformationServiceInterface{
         JSONObject jsonOb = null;
         try {
             jsonOb = new JSONObject(output);
-            JSONArray owners = jsonOb.getJSONArray("owners");
+//            JSONArray owners = jsonOb.getJSONArray("owners");
+            String creator = jsonOb.getString("creator");
+            String creatorID = creator.substring(creator.lastIndexOf(":") + 1);
 
             // find the group of the owner of the entity
-            String groupID = findGroupID(sessionId, UserID);
+            String groupID = findGroupID(sessionId, creatorID);
 
             // find the groups that the user is a member of
             JSONArray roleinGroups = findUserGroups(sessionId, UserID);
 
+
+
             int i = 0;
-            while (i < owners.length()) {
+            while (i < roleinGroups.length()) {
                 if(roleinGroups.getJSONObject(i).getString("group").equals(groupID)){
                     String roleID = roleinGroups.getJSONObject(i).getString("groupRole");
                     System.out.println("IT IS A MATCH");
@@ -223,7 +235,7 @@ public class InformationService implements InformationServiceInterface{
             }
 
             System.out.println(jsonOb);
-            System.out.println(owners);
+            System.out.println(creatorID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -267,6 +279,9 @@ public class InformationService implements InformationServiceInterface{
         try {
             jsonOb = new JSONObject(output);
             JSONArray roleInGroup = jsonOb.getJSONArray("roleInGroup");
+            if(roleInGroup.length() <= 0){
+                return null;
+            }
             JSONObject groupAndGroupRole = roleInGroup.getJSONObject(0);
             groupID = groupAndGroupRole.get("group").toString();
 
