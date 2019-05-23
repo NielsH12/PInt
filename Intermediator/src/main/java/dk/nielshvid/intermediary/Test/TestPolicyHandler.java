@@ -24,22 +24,25 @@ public class TestPolicyHandler {
     @BeforeMethod
     public void setup() {
         map = mock(MultivaluedMap.class);
-        policyHandler = new PolicyHandler(rolePolicyMap, entityPolicyMap, informationService);
+
+
+        //TODO: fix rolePolicyMap
+        policyHandler = new PolicyHandler(null, entityPolicyMap, informationService);
     }
 
     // RoleAuthorize
     @Test
     public void Role_Without_ActionPermission_ReturnsFlase() {
-        boolean actual = policyHandler.roleAuthorize("Decan", "Freezer/retrieve", null);
+        boolean actual = policyHandler.roleAuthorize("Decan", "Freezer/retrieve", null, null);
         Assert.assertFalse(actual);
 
-        actual = policyHandler.roleAuthorize("Doctor", "ActionNotAllowed", null);
+        actual = policyHandler.roleAuthorize("Doctor", "ActionNotAllowed", null, null);
         Assert.assertFalse(actual);
     }
 
     @Test
     public void Role_with_ActionPermission_returnsTrue() {
-        final boolean actual = policyHandler.roleAuthorize("Doctor", "Freezer/retrieve", null);
+        final boolean actual = policyHandler.roleAuthorize("Doctor", "Freezer/retrieve", null, null);
         Assert.assertTrue(actual);
     }
 
@@ -48,7 +51,7 @@ public class TestPolicyHandler {
         when(map.getFirst("xPos")).thenReturn("2");
         when(map.getFirst("yPos")).thenReturn("0");
 
-        final boolean actual = policyHandler.roleAuthorize("Doctor", "BoxDB/insert", map);
+        final boolean actual = policyHandler.roleAuthorize("Doctor", "BoxDB/insert", map, null);
         Assert.assertTrue(actual);
     }
 
@@ -139,7 +142,7 @@ public class TestPolicyHandler {
     private boolean setupQmap(String xPos, String yPos){
         when(map.getFirst("xPos")).thenReturn(xPos);
         when(map.getFirst("yPos")).thenReturn(yPos);
-        return policyHandler.roleAuthorize("Doctor", "BoxDB/insert", map);
+        return policyHandler.roleAuthorize("Doctor", "BoxDB/insert", map, null);
     }
 
     private HashMap<String, HashMap<String, PolicyHandler.Condition>> rolePolicyMap = new HashMap<String, HashMap<String, PolicyHandler.Condition>>() {{

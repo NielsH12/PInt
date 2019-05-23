@@ -1,5 +1,6 @@
 package dk.nielshvid.intermediary;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -65,13 +66,16 @@ public class PolicyHandler {
 		if(informationService != null){this.informationService = informationService;}
 	}
 
-	public boolean roleAuthorize(String Role, String Action, MultivaluedMap<String, String> map, JSONObject body) {
+	public boolean roleAuthorize(String Role, String Action, MultivaluedMap<String, String> map, String body) {
 //		System.out.println("PolicyHandler.roleAuthorize()");
 		try {
 			//System.out.println("\t Authorize");
-			return rolePolicyMap3.get(Role).get(Action).evaluate(map, body);
+			JSONObject jsonOb =  new JSONObject(body);
+
+			return rolePolicyMap3.get(Role).get(Action).evaluate(map, jsonOb);
 		} catch (Exception e) {
 			System.out.println("\t " + Role + " is not allowed to perform action: " + Action);
+			System.out.println("Exeption: " + e);
 			return false;
 		}
 	}

@@ -45,7 +45,8 @@ public class TestShield {
         when(informationService.getRole(UserID, EntityID)).thenReturn(RoleWithPolicy);
         when(informationService.getEntityType(EntityWithNoPolicies)).thenReturn(ENTITY_TYPES_WITH_NOTHING_FOR_TESTING);
 
-        PolicyHandler PH = new PolicyHandler(rolePolicyMap, entityPolicyMap, informationService);
+        //TODO fix rolePolicyMap for tests!!!!
+        PolicyHandler PH = new PolicyHandler(null, entityPolicyMap, informationService);
 
         CapabilityHandler CH = mock(CapabilityHandler.class);
         when(CH.addCapability(anyString(), anyString(), anyString())).thenReturn(expectedUUID);
@@ -57,7 +58,8 @@ public class TestShield {
     //rolePolicyFreeActions
     @Test
     public void Action_in_rolePolicyFreeActions_ReturnsTrue() {
-        final boolean actual = shield.authorize(null, EntityWithNoPolicies, null, KeyInRolePolicyFreeActions, null);
+//        final boolean actual = shield.authorize(null, EntityWithNoPolicies, null, KeyInRolePolicyFreeActions, null, null);
+        final boolean actual = shield.authorize(null, null, null);
         //
         Assert.assertTrue(actual);
     }
@@ -65,7 +67,8 @@ public class TestShield {
     @Test(expectedExceptions = {WebApplicationException.class}, expectedExceptionsMessageRegExp = "RP: Permission denied")
     public void Action_notIn_rolePolicyFreeActions_ReturnsException() {
 
-        shield.authorize(null, null, null, keyNotInRolePolicyFreeActions, null);
+//        shield.authorize(null, null, null, keyNotInRolePolicyFreeActions, null, null);
+        shield.authorize(null, null, null);
     }
 
     //rolePolicies
@@ -104,29 +107,34 @@ public class TestShield {
     // CapabilityPolicies
     @Test
     public void GenerateCapability_returns_UUID_WhenNoPolicyIsBlocking() {
-        UUID actual = shield.generateCapability(UserID, EntityID, KeyInRolePolicyFreeActions, null);
+//        UUID actual = shield.generateCapability(UserID, EntityID, KeyInRolePolicyFreeActions, null,null);
+        UUID actual = shield.generateCapability( KeyInRolePolicyFreeActions, null,null);
         Assert.assertEquals(actual, expectedUUID);
     }
 
     @Test
     public void GenerateCapability_Are_Enforced_By_Policies() {
         // fail rolePolicy
-        UUID expectedNull = shield.generateCapability(UserID, EntityID, keyNotInRolePolicyFreeActions, null);
+//        UUID expectedNull = shield.generateCapability(UserID, EntityID, keyNotInRolePolicyFreeActions, null, null);
+        UUID expectedNull = shield.generateCapability(keyNotInRolePolicyFreeActions, null, null);
         Assert.assertNull(expectedNull);
 
         // pass rolePolicy
-        UUID actual = shield.generateCapability(UserID, EntityID, ImplementedActionWithBoolExp, null);
+//        UUID actual = shield.generateCapability(UserID, EntityID, ImplementedActionWithBoolExp, null, null);
+        UUID actual = shield.generateCapability(ImplementedActionWithBoolExp, null, null);
         Assert.assertEquals(actual, expectedUUID);
     }
 
     @Test(expectedExceptions = {WebApplicationException.class}, expectedExceptionsMessageRegExp = "CP: Invalid capability")
     public void capabilityPoliciesAreEnforced_WithWrongCapabilityID_ThrowException() {
-        shield.authorize(UserID, EntityWithNoPolicies, null, ActionEnforcedByCapOnly, null);
+//        shield.authorize(UserID, EntityWithNoPolicies, null, ActionEnforcedByCapOnly, null, null);
+        shield.authorize(ActionEnforcedByCapOnly, null, null);
     }
 
     @Test
     public void capabilityPoliciesAreEnforced_WithRightCapabilityID_ReturnsTrue() {
-        final boolean actual = shield.authorize(UserID, EntityWithNoPolicies, ValidCapaID, ActionEnforcedByCapOnly, null);
+//        final boolean actual = shield.authorize(UserID, EntityWithNoPolicies, ValidCapaID, ActionEnforcedByCapOnly, null, null);
+        final boolean actual = shield.authorize(ActionEnforcedByCapOnly, null, null);
         Assert.assertTrue(actual);
     }
 
@@ -135,7 +143,8 @@ public class TestShield {
         when(informationService.getRole(UserID, EntityID)).thenReturn(returnRole);
         when(informationService.getEntityType(EntityID)).thenReturn(SAMPLE);
 
-        return shield.authorize(UserID, EntityID, null, implementedAction, null);
+//        return shield.authorize(UserID, EntityID, null, implementedAction, null, null);
+        return shield.authorize(implementedAction, null, null);
     }
 
     private boolean testShieldEntityAuthorize(String implementedAction, String returnRole, int temperature) {
@@ -150,7 +159,8 @@ public class TestShield {
 
         when(informationService.getSample(EntityID)).thenReturn(sample);
 
-        return shield.authorize(UserID, EntityID, null, implementedAction, mockedMap);
+//        return shield.authorize(UserID, EntityID, null, implementedAction, mockedMap, null);
+        return shield.authorize(implementedAction, mockedMap, null);
     }
 
 //    private boolean debugLamdaExp(MultivaluedMap<String, String> map){
