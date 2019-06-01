@@ -9,49 +9,56 @@ import org.testng.annotations.Test;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.EmptyStackException;
 import java.util.UUID;
+import dk.nielshvid.intermediary.Entities;
 
-import static dk.nielshvid.intermediary.Entities.EntityType.SAMPLE;
+//import static dk.nielshvid.intermediary.Entities.EntityType.SAMPLE;
 
 public class InformationService implements InformationServiceInterface{
     private static String connectionUrl = "jdbc:sqlserver://localhost;user=jba;password=123";
     private static Client client = ClientBuilder.newClient();
     private static Gson gson = new Gson();
-    private static Entities.Person person;
+//    private static Entities.Person person;
     private static Entities.Sample sample;
-    private static Entities.Pizza pizza;
+    private static Entities.Blood blood;
+//    private static Entities.Pizza pizza;
+
+//    @Override
+//    public String getRole(String UserID, String EntityID){
+//
+//        UUID OrgID;
+//        try {
+//            OrgID = UUID.fromString(EntityID.substring(37));
+//        }
+//        catch (Exception e){
+//            return null;
+//        }
+//
+//        String roleResult = findRole(UserID, OrgID);
+//
+//        if(roleResult!= null){
+//            return roleResult;
+//        }
+//
+//        String parrentOrgResult = findParrentOrg(OrgID);
+//        if (parrentOrgResult == null){
+//            return null;
+//        }
+//
+//        return getRole(UserID, parrentOrgResult);
+//    }
 
     @Override
-    public String getRole(String UserID, String EntityID){
-        UUID OrgID;
-        try {
-            OrgID = UUID.fromString(EntityID.substring(37));
-        }
-        catch (Exception e){
-            return null;
-        }
-
-        String roleResult = findRole(UserID, OrgID);
-
-        if(roleResult!= null){
-            return roleResult;
-        }
-
-        String parrentOrgResult = findParrentOrg(OrgID);
-        if (parrentOrgResult == null){
-            return null;
-        }
-
-        return getRole(UserID, parrentOrgResult);
-    }
-
-    @Override
-    public Entities.EntityType getEntityType(String EntityID) {
-        return SAMPLE;
+//    public Entities.EntityType getEntityType(String EntityID) {
+    public String getEntityType(MultivaluedMap<String, String> QPmap) {
+//        return SAMPLE;
+        return "Sample";
     }
 
     @Override
@@ -65,24 +72,34 @@ public class InformationService implements InformationServiceInterface{
     }
 
     @Override
-    public Entities.Pizza getPizza(String id){
-        Response response = client.target("127.0.0.1/" + "getPizza?PizzaID=" + id).request().get();
+    public Entities.Blood getBlood(String id){
+        Response response = client.target("127.0.0.1/" + "getSample?SampleID=" + id).request().get();
 
         String readEntity = response.readEntity(String.class);
 
-        pizza = gson.fromJson(readEntity, Entities.Pizza.class);
-        return pizza;
+        blood = gson.fromJson(readEntity, Entities.Blood.class);
+        return blood;
     }
 
-    @Override
-    public Entities.Person getPerson(String id){
-        Response response = client.target("127.0.0.1/" + "getPerson?PersonID=" + id).request().get();
+//    @Override
+//    public Entities.Pizza getPizza(String id){
+//        Response response = client.target("127.0.0.1/" + "getPizza?PizzaID=" + id).request().get();
+//
+//        String readEntity = response.readEntity(String.class);
+//
+//        pizza = gson.fromJson(readEntity, Entities.Pizza.class);
+//        return pizza;
+//    }
 
-        String readEntity = response.readEntity(String.class);
-
-        person = gson.fromJson(readEntity, Entities.Person.class);
-        return person;
-    }
+//    @Override
+//    public Entities.Person getPerson(String id){
+//        Response response = client.target("127.0.0.1/" + "getPerson?PersonID=" + id).request().get();
+//
+//        String readEntity = response.readEntity(String.class);
+//
+//        person = gson.fromJson(readEntity, Entities.Person.class);
+//        return person;
+//    }
 
 
     private static String findParrentOrg(UUID OrgID)  {
@@ -170,46 +187,97 @@ public class InformationService implements InformationServiceInterface{
             System.out.println("Got caught on first try-catch (Connection error)");
         }
     }
+    @Override //getRoleFromFFU
+    public String getRoleByOrganization(String UserID, String OrganizationID){
+        return null;
+    }
 
     @Test
-    public void getRoleFromFFU(){
-//        String UserID = "userDB:4874f6893b22609d8b00c98223299a9b";
-//        String LogicalSetID = "4874f6893b22609d8b00c9822329c253"; // matches with UserID
-//        String LogicalSetID = "4874f6893b22609d8b00c982232aa772"; // does NOT match with userID
+    //getRoleFromFFU
+    public String getPhysicalsets(){
 
-//        String UserID = "userDB:0d403b82b42785881e0aff5c2800de7a";
-//        String LogicalSetID = "325b1b331f5b8b0dbc8ddc81fa019be0";
-
-        String UserID = "userDB:fc672cb8b8901cc7c2e6c2ef83008bb7";
-        String LogicalSetID = "fc672cb8b8901cc7c2e6c2ef83009ba5";
-
+        String EntityID = "0d403b82b42785881e0aff5c2800c516";
         String authenticateBody = "{\n" +
                 "\"username\":\"sJespersen\",\n" +
                 "\"password\": \"sJespersen$FFU\"\n" +
                 "}\n";
-
-        Response authenticate = client
-                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/authenticate/login")
+        Invocation.Builder builder = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/")
+                .path("biostore/authenticate/login")
                 .request()
-                .header("Content-Type", "application/json")
-                .post(Entity.json(authenticateBody));
-        String output = authenticate.readEntity(String.class);
+                .header("Content-Type", "application/json");
+
+        Response auth = builder.post(Entity.json(authenticateBody));
+
+
+        String output = auth.readEntity(String.class);
         System.out.println(output);
-        final Cookie sessionId = authenticate.getCookies().get("connect.sid");
+
+        final Cookie sessionId = auth.getCookies().get("connect.sid");
 
 
-        Response response = client
-                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/logicalsets/"+ LogicalSetID)
+        Invocation.Builder builderLogicalsets = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/physicalsets/"+ EntityID)
                 .request()
-                .cookie(sessionId)
-                .get();
+                .cookie(sessionId);
 
-        output = response.readEntity(String.class);
+        Response responseLogic = builderLogicalsets.get();
+        output = responseLogic.readEntity(String.class);
 
         JSONObject jsonOb = null;
         try {
             jsonOb = new JSONObject(output);
-//            JSONArray owners = jsonOb.getJSONArray("owners");
+
+            Gson gson = new Gson();
+
+            Entities.Physicalsets physicalsets = gson.fromJson(output, Entities.Physicalsets.class);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        System.out.println(output);
+        return null;
+    }
+
+    @Override //getRoleFromFFU
+    public String getRoleByEntity(String UserID, String EntityID){
+
+        if(true){
+            return "Observer";
+        }
+        String authenticateBody = "{\n" +
+                "\"username\":\"sJespersen\",\n" +
+                "\"password\": \"sJespersen$FFU\"\n" +
+                "}\n";
+        Invocation.Builder builder = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/")
+                .path("biostore/authenticate/login")
+                .request()
+                .header("Content-Type", "application/json");
+
+        Response auth = builder.post(Entity.json(authenticateBody));
+
+
+        String output = auth.readEntity(String.class);
+        System.out.println(output);
+
+        final Cookie sessionId = auth.getCookies().get("connect.sid");
+
+
+        Invocation.Builder builderLogicalsets = client
+                .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/logicalsets/"+ EntityID)
+                .request()
+                .cookie(sessionId);
+
+        Response responseLogic = builderLogicalsets.get();
+        output = responseLogic.readEntity(String.class);
+
+        JSONObject jsonOb = null;
+        try {
+            jsonOb = new JSONObject(output);
             String creator = jsonOb.getString("creator");
             String creatorID = creator.substring(creator.lastIndexOf(":") + 1);
 
@@ -228,8 +296,9 @@ public class InformationService implements InformationServiceInterface{
                     System.out.println("IT IS A MATCH");
                     System.out.println("USERS ROLEID IS: " + roleID);
 
-                    String roleName = getRole(sessionId, roleID);
+                    String roleName = getRole2(sessionId, roleID);
                     System.out.println("USERS ROLENAME IS: " + roleName);
+                    return roleName;
                 }
                 i++;
             }
@@ -240,16 +309,18 @@ public class InformationService implements InformationServiceInterface{
             e.printStackTrace();
         }
 
+
         System.out.println(output);
-        client.close();
+        return null;
     }
 
-    private String getRole(Cookie sessionId, String roleID){
-        Response response = client
+    private String getRole2(Cookie sessionId, String roleID){
+        Invocation.Builder builder = client
                 .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/roles/"+ roleID)
                 .request()
-                .cookie(sessionId)
-                .get();
+                .cookie(sessionId);
+
+        Response response = builder.get();
         String output = response.readEntity(String.class);
 
         JSONObject jsonOb = null;
@@ -267,11 +338,12 @@ public class InformationService implements InformationServiceInterface{
     }
 
     private String findGroupID(Cookie sessionId, String UserID){
-        Response response = client
+        Invocation.Builder builder = client
                 .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/users/"+ UserID)
                 .request()
-                .cookie(sessionId)
-                .get();
+                .cookie(sessionId);
+
+        Response response = builder.get();
         String output = response.readEntity(String.class);
 
         JSONObject jsonOb = null;
@@ -296,11 +368,12 @@ public class InformationService implements InformationServiceInterface{
     }
 
     private JSONArray findUserGroups(Cookie sessionId, String UserID){
-        Response response = client
+        Invocation.Builder builder = client
                 .target("http://tek-ffu-h0a.tek.sdu.dk:80/biostore/users/"+ UserID)
                 .request()
-                .cookie(sessionId)
-                .get();
+                .cookie(sessionId);
+
+        Response response = builder.get();
         String output = response.readEntity(String.class);
 
         JSONObject jsonOb = null;

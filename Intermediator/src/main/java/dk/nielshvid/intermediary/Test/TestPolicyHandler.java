@@ -12,14 +12,14 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static dk.nielshvid.intermediary.Entities.EntityType.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestPolicyHandler {
     private PolicyHandler policyHandler;
-    private InformationServiceInterface informationService;
+    private TestInformationServiceInterface informationService;
     private MultivaluedMap<String, String> map;
+    private String SAMPLE = "sample";
 
     @BeforeMethod
     public void setup() {
@@ -27,7 +27,7 @@ public class TestPolicyHandler {
 
 
         //TODO: fix rolePolicyMap
-        policyHandler = new PolicyHandler(null, entityPolicyMap, informationService);
+        policyHandler = new PolicyHandler(rolePolicyMap, entityPolicyMap, informationService);
     }
 
     // RoleAuthorize
@@ -110,11 +110,11 @@ public class TestPolicyHandler {
         String uuid = UUID.randomUUID().toString();
         when(map.getFirst("SampleID")).thenReturn(uuid);
 
-        Entities.Sample sample = mock(Entities.Sample.class);
+        TestSample sample = mock(TestSample.class);
         sample.accessed = localDate;
 
-        informationService = mock(InformationServiceInterface.class);
-        when(informationService.getSample(uuid)).thenReturn(sample);
+        informationService = mock(TestInformationServiceInterface.class);
+        when(informationService.TestgetSample(uuid)).thenReturn(sample);
 
         // True exp
         boolean actual = policyHandler.entityAuthorize(SAMPLE, "TestDateCompare", map);
@@ -130,11 +130,11 @@ public class TestPolicyHandler {
         String uuid = UUID.randomUUID().toString();
         when(map.getFirst("SampleID")).thenReturn(uuid);
 
-        Entities.Sample sample = mock(Entities.Sample.class);
+        TestSample sample = mock(TestSample.class);
         sample.temperature = wrongAnswer;
 
-        informationService = mock(InformationServiceInterface.class);
-        when(informationService.getSample(uuid)).thenReturn(sample);
+        informationService = mock(TestInformationServiceInterface.class);
+        when(informationService.TestgetSample(uuid)).thenReturn(sample);
 
         return policyHandler.entityAuthorize(SAMPLE, "Freezer/retrieve", map);
     }
@@ -145,31 +145,43 @@ public class TestPolicyHandler {
         return policyHandler.roleAuthorize("Doctor", "BoxDB/insert", map, null);
     }
 
-    private HashMap<String, HashMap<String, PolicyHandler.Condition>> rolePolicyMap = new HashMap<String, HashMap<String, PolicyHandler.Condition>>() {{
-        put("Decan", new HashMap<String, PolicyHandler.Condition>(){{
+    private HashMap<String, HashMap<String, PolicyHandler.RoleCondition>> rolePolicyMap = new HashMap<String, HashMap<String, PolicyHandler.RoleCondition>>() {{
+        put("Decan", new HashMap<String, PolicyHandler.RoleCondition>(){{
         }});
-        put("Doctor", new HashMap<String, PolicyHandler.Condition>(){{
-            put("Freezer/retrieve", map -> true);
-            put("Freezer/insert", map -> true);
-            put("BoxDB/retrieve", map -> (1 <= 2));
-            put("BoxDB/insert", map -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0)));
+        put("Doctor", new HashMap<String, PolicyHandler.RoleCondition>(){{
+            put("Freezer/retrieve", (map, body) -> true);
+            put("Freezer/insert", (map, body) -> true);
+            put("BoxDB/retrieve", (map, body) -> (1 <= 2));
+            put("BoxDB/insert", (map, body) -> ((Integer.parseInt(map.getFirst("xPos")) == 2)&&(Integer.parseInt(map.getFirst("yPos")) == 0)));
         }});
-        put("Assistant", new HashMap<String, PolicyHandler.Condition>(){{
+        put("Assistant", new HashMap<String, PolicyHandler.RoleCondition>(){{
         }});
-        put("Student", new HashMap<String, PolicyHandler.Condition>(){{
+        put("Student", new HashMap<String, PolicyHandler.RoleCondition>(){{
         }});
     }};
 
-    private HashMap<Entities.EntityType, HashMap<String, PolicyHandler.Condition>> entityPolicyMap = new HashMap<Entities.EntityType, HashMap<String, PolicyHandler.Condition>>() {{
-        put(PERSON, new HashMap<String, PolicyHandler.Condition>(){{
+    private HashMap<String, HashMap<String, PolicyHandler.EntityCondition>> entityPolicyMap = new HashMap<String, HashMap<String, PolicyHandler.EntityCondition>>() {{
+        put(SAMPLE, new HashMap<String, PolicyHandler.EntityCondition>(){{
         }});
-        put(SAMPLE, new HashMap<String, PolicyHandler.Condition>(){{
+        put(SAMPLE, new HashMap<String, PolicyHandler.EntityCondition>(){{
             put("Freezer/insert", (map) -> (2 == 2));
-            put("Freezer/retrieve", (map) -> (informationService.getSample(map.getFirst("SampleID")).temperature == 0));
-            put("TestDateCompare", (map) -> (1 < PolicyHandler.CompareDates(informationService.getSample(map.getFirst("SampleID")).accessed, LocalDate.now())));
-        }});
-        put(PIZZA, new HashMap<String, PolicyHandler.Condition>(){{
+            put("Freezer/retrieve", (map) -> (informationService.TestgetSample(map.getFirst("SampleID")).temperature == 0));
+            put("TestDateCompare", (map) -> (1 < PolicyHandler.CompareDates(informationService.TestgetSample(map.getFirst("SampleID")).accessed, LocalDate.now())));
         }});
     }};
+
+    private interface TestInformationServiceInterface extends InformationServiceInterface{
+
+        String getRoleByEntity(String UserID, String EntityID);
+        String getRoleByOrganization(String UserID, String OrganizationID);
+        String getEntityType(MultivaluedMap<String, String> QPmap);
+
+        TestSample TestgetSample(String id);
+    }
+
+    public static class TestSample {
+        public LocalDate accessed;
+        public int temperature;
+    }
 }
 
