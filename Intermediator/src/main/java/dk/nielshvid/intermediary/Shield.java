@@ -119,12 +119,12 @@ public class Shield {
 		if(capabilityRequiringResources.contains(resource)){
 			String tempCapID = QPmap.getFirst("CapabilityID");
 			if (UserID == null || tempCapID == null){
-				throw new WebApplicationException("CP: Missing input", Response.Status.BAD_REQUEST);
+				throw new WebApplicationException("OP: Missing input", Response.Status.BAD_REQUEST);
 			}
 		
 			UUID CapabilityID = UUID.fromString(tempCapID);
 			if(!capabilityHandler.authorize(UserID, CapabilityID, resource)){
-				throw new WebApplicationException("CP: Invalid capability", Response.Status.FORBIDDEN);
+				throw new WebApplicationException("OP: Invalid capability", Response.Status.FORBIDDEN);
 			}
 		}
 		return true;
