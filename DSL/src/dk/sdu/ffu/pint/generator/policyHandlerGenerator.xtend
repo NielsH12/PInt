@@ -120,10 +120,10 @@ class policyHandlerGenerator{
 			}
 		}
 		
-		private interface RoleCondition {
+		public interface RoleCondition {
 			boolean evaluate(MultivaluedMap<String, String> map, JSONObject body) throws JSONException;
 		}
-		private interface EntityCondition {
+		public interface EntityCondition {
 			boolean evaluate(MultivaluedMap<String, String> mMap);
 		}
 		
@@ -251,11 +251,6 @@ class policyHandlerGenerator{
 	def static dispatch CharSequence rGetJsonType(BranchElement x){
 			x.child.rGetJsonType
 	}
-	
-	
-	
-	
-	
 	
 	
 	

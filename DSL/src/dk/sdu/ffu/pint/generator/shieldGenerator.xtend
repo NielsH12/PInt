@@ -41,6 +41,25 @@ class shieldGenerator{
 		import java.util.UUID;
 		
 		public class Shield {
+			public Shield(){}
+			public Shield(InformationServiceInterface informationService, HashSet<String> rolePolicyFreeResources,
+						  HashSet<String> capabilityRequiringResources, HashMap<String, HashSet> entityPolicyRequiringResources,
+						  PolicyHandler policyHandler, CapabilityHandler capabilityHandler){
+				if(informationService != null){this.informationService = informationService;}
+				if(rolePolicyFreeResources != null){
+					Shield.rolePolicyFreeResources = rolePolicyFreeResources;}
+				if(capabilityRequiringResources != null){
+					Shield.capabilityRequiringResources = capabilityRequiringResources;}
+				if(entityPolicyRequiringResources != null){
+					Shield.entityPolicyRequiringResources = entityPolicyRequiringResources;}
+				if(policyHandler != null){
+					this.policyHandler = policyHandler;
+				}
+				if(capabilityHandler != null){
+					this.capabilityHandler = capabilityHandler;
+				}
+			}
+		
 			private PolicyHandler policyHandler = new PolicyHandler();
 			private CapabilityHandler capabilityHandler = new CapabilityHandler();
 			private InformationService informationService = new InformationService();
@@ -126,7 +145,7 @@ class shieldGenerator{
 				// Check role policy
 				if(!rolePolicyFreeResources.contains(resource)){
 					if(!policyHandler.roleAuthorize(role, resource, QPmap, body)){
-						throw new WebApplicationException("PR: Permission denied", Response.Status.FORBIDDEN);
+						throw new WebApplicationException("RP: Permission denied", Response.Status.FORBIDDEN);
 					}
 				}
 				
@@ -142,12 +161,12 @@ class shieldGenerator{
 				if(capabilityRequiringResources.contains(resource)){
 					String tempCapID = QPmap.getFirst("CapabilityID");
 					if (UserID == null || tempCapID == null){
-						throw new WebApplicationException("CP: Missing input", Response.Status.BAD_REQUEST);
+						throw new WebApplicationException("OP: Missing input", Response.Status.BAD_REQUEST);
 					}
 				
 					UUID CapabilityID = UUID.fromString(tempCapID);
 					if(!capabilityHandler.authorize(UserID, CapabilityID, resource)){
-						throw new WebApplicationException("CP: Invalid capability", Response.Status.FORBIDDEN);
+						throw new WebApplicationException("OP: Invalid capability", Response.Status.FORBIDDEN);
 					}
 				}
 				return true;
