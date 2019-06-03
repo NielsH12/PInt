@@ -1,0 +1,95 @@
+endpoint Freezer{
+    url:"http://ffu.freezer.com"
+    resource authorize{
+        path:"authorize"
+        verb: POST
+        produces: json
+    }
+    
+    resource insert {
+        path: "insert"
+        verb: PUT
+        produces: plain
+        body: {
+            bloodtype: string
+        }
+    }
+    resource retrieve {
+        path: "retrieve"
+        verb: GET
+        produces: json
+        parameters: "xPos" int "yPos" int
+    }
+    resource querySample {
+        path: "querysample"
+        verb: GET
+        produces: json
+    }
+}
+
+endpoint FFU{
+   url:"http://tek-ffu-h0a.tek.sdu.dk:80"
+   resource authorize{
+		path:"biostore/authenticate/login"
+		verb: POST
+		produces: json
+   }
+
+   resource logicalsetsGET {
+		path: "biostore/physicalsets"
+		verb: GET
+		produces: json
+   }
+    
+    resource logicalsetsPUT {
+		path: "biostore/physicalsets"
+		verb: PUT
+		produces: json
+		body: {
+       		containerSpec: string
+       		containerSize: int
+		}
+	}
+}
+
+entity Sample {
+  identifier string sampleID
+   string owner
+   date accessed
+}
+
+role Supervisor
+role Assistant
+role Researcher
+role Observer
+
+// Obligation-based policies
+capabilities {
+	Freezer.querySample {
+    	Freezer.retrieve
+	}
+}
+
+//Role-based policies
+rolepolicy : everyone can access FFU.authorize
+
+// Researcher policies
+rolepolicy : Researcher can access Freezer.querySample
+rolepolicy : Researcher can access Freezer.retrieve
+rolepolicy : Researcher can access Freezer.insert
+rolepolicy : Researcher can access FFU.logicalsetsGET
+rolepolicy : Researcher can access FFU.logicalsetsPUT if(StringCompare(body.containerSpec, "c") && body.containerSize == 81)
+
+// Assistant policies
+rolepolicy : Assistant can access Freezer.querySample
+rolepolicy : Assistant can access Freezer.insert  if (StringCompare(body.bloodtype, "AB+"))
+
+// Supervisor policies
+rolepolicy : Supervisor can access Freezer.querySample
+
+// Observer
+rolepolicy : Observer can access FFU.logicalsetsGET
+rolepolicy : Observer can access FFU.logicalsetsPUT if(StringCompare(body.containerSpec, "a") && body.containerSize == 64)
+
+// Entity-based policies
+require : Sample ( DaysBetween(accessed, today) > 2) for Freezer.retrieve

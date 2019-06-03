@@ -1,0 +1,251 @@
+grammar dk.sdu.ffu.pint.Pint with org.eclipse.xtext.common.Terminals
+generate pint "http://www.sdu.dk/ffu/pint/Pint"
+
+Intermediary:
+	elements+=Element*
+;
+
+Element:
+	Endpoint | Entity | Capability | Role | RolePolicy | EntityPolicy
+;
+
+Capability:
+	'capabilities' '{'  capabilities += CapabilityRule+ '}'
+;
+
+CapabilityRule:
+	restResource = [RestResource | FQN] '{'
+		subRestResource += CapabilityRestResource*
+	'}'
+;
+
+Entity:
+	'entity' name=ID '{' ('uri' ':' uri=STRING)? 'identifier' idType=Type  idName=ID properties += Property* '}'
+;
+
+Property:
+	type=(Type|EntityRef) name=ID
+;
+
+Type:
+	({tString}'string' | {tInt}'int' | {tFloat}'float' | {tBoolean}'boolean' | {tDate}'date' | {tTime}'time')
+;
+
+EntityRef:
+	ref=[Entity]
+;
+
+CapabilityRestResource:
+	restResource = [RestResource | FQN] ('{' nestedCapabilityRestResources += CapabilityRestResource* '}')?
+;
+
+Endpoint:
+	'endpoint' name=ID '{'
+	
+	'url' ':' uri = STRING
+	
+	restResources += RestResource*
+	
+	'}'
+;
+
+FQN: ID ("." ID)*;
+
+RestResource:
+	'resource' name=ID '{'
+
+	'path' ':' path = STRING
+	'verb' ':' httpVerb = HttpVerbs
+	'produces' ':' product = produceType
+	('parameters' ':' queryParam+=QueryParam*)?
+	('body' ':' httpBody=HttpBody)?
+	'}'
+;
+
+HttpVerbs:	
+	 'GET' | 'POST' | 'PUT' | 'DELETE'
+;
+
+QueryParam:
+	name=STRING type=QueryType
+;
+
+QueryType:
+	'int'| 'string'
+;
+
+produceType:
+	'html' | 'plain' | 'json'
+;
+
+RoleType:
+	roleRefs  = RoleRef | {Everyone}'everyone'
+;
+
+RoleRef:
+	ref = [Role]
+;
+
+Role:
+	'role' name=ID
+;
+
+RolePolicy:
+	'rolepolicy' ':' role=RoleType 'can' 'access' restResource=[RestResource|FQN] require=RoleRequire?
+;
+
+EntityPolicy:
+	'require' ':' entity=[Entity] require=Require 'for' restResource=[RestResource|FQN]
+;
+
+Require:
+	'(' requirement=LogicExp ')'
+;
+
+RoleRequire:
+	'if' '(' requirement=rLogicExp ')'
+;
+
+LogicExp returns Proposition:
+	Conjunction ('||' {OR.left=current} right=Conjunction)* 
+;
+
+Conjunction returns Proposition:
+	Condition ('&&' {AND.left=current} right=Condition)*
+;
+
+Condition returns Proposition:
+	 Comparison | StringComparison
+;
+
+Comparison:
+	left=Exp op=RelationalOp right=Exp
+;
+
+RelationalOp:
+	{RelEQ} '==' | {RelLT} '<' | {RelGT} '>' | {RelLTE} '<=' | {RelGTE} '>=' | {RelNEQ} '!='
+;
+
+Exp returns Expression:
+	Factor ( ('+' {Add.left=current} | '-' {Sub.left=current}) right=Factor)*
+;
+
+Factor returns Expression:
+	Primitive ( ('*' {Mul.left=current} | '/' {Div.left=current}) right=Primitive)*
+;
+
+Primitive returns Expression:
+	IntExp | EntityProperty | Bool | DateComparison | '(' logicExp=LogicExp ')'// | StringComparison
+;
+
+DateComparison:
+	'DaysBetween' '(' left=DateExp ',' right=DateExp ')'
+;
+
+DateExp:
+	EntityProperty | {today}'today'
+;
+
+EntityProperty:
+	entityPropertyRef=EntityPropertyRef
+;
+
+EntityPropertyRef:
+	 propertyRef=[Property] ('.'ref=EntityPropertyRef)?
+;
+
+IntExp:
+	value=INT
+;
+
+StringComparison:
+	'StringCompare' '(' left=StringValue ',' right=StringValue ')'
+;
+
+StringValue:
+	StringPrim | EntityProperty | QueryParamRef | BodyRef
+;
+
+rStringComparison:
+	'StringCompare' '(' left=rStringValue ',' right=rStringValue ')'
+;
+
+rStringValue:
+	StringPrim | QueryParamRef | BodyRef
+;
+ 
+StringPrim:
+	value=STRING
+;
+
+Bool:
+	bool=('true' | 'false')
+;
+
+rLogicExp returns Proposition:
+	rConjunction ('||' {OR.left=current} right=rConjunction)* 
+;
+
+rConjunction returns Proposition:
+	rCondition ('&&' {AND.left=current} right=rCondition)*
+;
+
+rCondition returns Proposition:
+	 rComparison | rStringComparison
+;
+
+rComparison:
+	left=rExp (op=RelationalOp right=rExp)?
+;
+
+rExp returns Expression:
+	rFactor ( ('+' {Add.left=current} | '-' {Sub.left=current}) right=rFactor)*
+;
+
+rFactor returns Expression:
+	rPrimitive ( ('*' {Mul.left=current} | '/' {Div.left=current}) right=rPrimitive)*
+;
+
+rPrimitive returns Expression:
+	IntExp | '(' logicExp=rLogicExp ')' | QueryParamRef | Bool | BodyRef
+;
+
+HttpBody:
+	'{' jsonElements += JsonElement+ '}'
+;
+
+JsonElement:
+	JsonObject | KvPair 
+;
+
+JsonObject:
+	name = ID ':' '{' jsonElements += JsonElement+ '}'
+;
+
+KvPair:
+	name = ID ':' type = JsonType
+;
+
+JsonType:
+	'int'| 'string'
+;
+
+QueryParamRef:
+	'queryparameter' '.' ref=[QueryParam]
+;
+
+BodyRef:
+	'body'  jsonRef=TreeElement 
+;
+
+TreeElement:
+	LeafElement | BranchElement
+;
+
+BranchElement:
+	'.' jsonObjectRef=[JsonObject] child=TreeElement
+;
+
+LeafElement:
+	'.' kvPairRef=[KvPair]
+;
