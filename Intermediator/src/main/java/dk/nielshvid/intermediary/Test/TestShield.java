@@ -136,7 +136,7 @@ public class TestShield {
         Assert.assertEquals(actual, expectedUUID);
     }
 
-    @Test(expectedExceptions = {WebApplicationException.class}, expectedExceptionsMessageRegExp = "CP: Missing input")
+    @Test(expectedExceptions = {WebApplicationException.class}, expectedExceptionsMessageRegExp = "OP: Missing input")
     public void capabilityPoliciesAreEnforced_WithWrongCapabilityID_ThrowException() {
         MultivaluedMap<String, String> localMap = new MultivaluedStringMap();
         localMap.add("UserID", UserID);
