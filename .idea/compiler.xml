@@ -6,16 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="AutomationLayerSimulator" />
         <module name="Intermediator" />
-        <module name="ServiceEmulator" />
-        <module name="StorageManagement" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="AutomationLayerSimulator" target="1.8" />
       <module name="FFUBACKEND" target="1.8" />
-      <module name="Intermediator" target="1.5" />
+      <module name="Intermediator" target="8" />
       <module name="ServiceEmulator" target="1.8" />
       <module name="StorageManagement" target="1.8" />
     </bytecodeTargetLevel>
