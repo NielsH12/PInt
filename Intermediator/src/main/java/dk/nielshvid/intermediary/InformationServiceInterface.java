@@ -9,5 +9,4 @@ public interface InformationServiceInterface {
     String getEntityType(MultivaluedMap<String, String> QPmap);
     
     Entities.Sample getSample(String id);
-    Entities.Blood getBlood(String id);
 }

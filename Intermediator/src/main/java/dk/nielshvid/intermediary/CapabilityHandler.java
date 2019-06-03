@@ -10,17 +10,17 @@ public class CapabilityHandler {
     private static LocalTime lastClean = LocalTime.now();
     private static final int CAPABILITY_LIFETIME_SECONDS = 300;
     private HashMap<String, Node<String>> capabilityTemplates = new HashMap<String, Node<String>>(){{
-    	
+		put("Freezer/querySample", new Node<String>("Freezer/querySample"){{
+			addChild(new Node<String>("Freezer/retrieve"){{
+			}});
+		}});
+    }}; 
+    public CapabilityHandler(){}
 
-        
-    }};
+    public CapabilityHandler(HashMap<String, Node<String>> capabilityTemplates){
+        this.capabilityTemplates = capabilityTemplates;
+    }
 
-	public CapabilityHandler(){}
-	public CapabilityHandler(HashMap<String, Node<String>> capabilityTemplates){
-		this.capabilityTemplates = capabilityTemplates;
-	}
-
-        
 	public UUID addCapability(String userID, String key){
 	
 		if(!capabilityTemplates.containsKey(key)){
@@ -60,7 +60,6 @@ public class CapabilityHandler {
 			}
 		}
 	}
-	
 	
 	private class Capability {
 		private LocalTime lastUsed;
@@ -112,16 +111,16 @@ public class CapabilityHandler {
 	
 		private T data = null;
 		private List<Node<T>> children = new ArrayList<>();
-
+		
 		protected Node(T data) {
 			this.data = data;
 		}
-
+		
 		protected Node<T> addChild(Node<T> child) {
 			this.children.add(child);
 			return child;
 		}
-
+		
 		Node<T> useResource(T resource){
 			for (Node n : this.getChildren()){
 				if (n.data == resource){

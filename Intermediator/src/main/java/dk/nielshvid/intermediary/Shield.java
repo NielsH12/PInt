@@ -11,26 +11,43 @@ public class Shield {
 	private CapabilityHandler capabilityHandler = new CapabilityHandler();
 	private InformationServiceInterface informationService = new InformationService();
 
+	public Shield(){}
+	public Shield(InformationServiceInterface informationService, HashSet<String> rolePolicyFreeResources,
+				  HashSet<String> capabilityRequiringResources, HashMap<String, HashSet> entityPolicyRequiringResources,
+				  PolicyHandler policyHandler, CapabilityHandler capabilityHandler){
+		if(informationService != null){this.informationService = informationService;}
+		if(rolePolicyFreeResources != null){
+			Shield.rolePolicyFreeResources = rolePolicyFreeResources;}
+		if(capabilityRequiringResources != null){
+			Shield.capabilityRequiringResources = capabilityRequiringResources;}
+		if(entityPolicyRequiringResources != null){
+			Shield.entityPolicyRequiringResources = entityPolicyRequiringResources;}
+		if(policyHandler != null){
+			this.policyHandler = policyHandler;
+		}
+		if(capabilityHandler != null){
+			this.capabilityHandler = capabilityHandler;
+		}
+	}
+
 	private static HashSet<String> rolePolicyFreeResources = new HashSet<String>() {{
-		add("Freezer/authorize");
+		add("FFU/authorize");
 	}};
-
+	
 	private static HashSet<String> capabilityRequiringResources = new HashSet<String>() {{
-//		add("Freezer/get");
-//		add("Freezer/fisk");
+        add("Freezer/retrieve");
 	}};
-
+	
 	private static HashMap<String, HashSet> entityPolicyRequiringResources = new HashMap<String, HashSet>(){{
-		put("Sample", new HashSet<String>(){{
-		}});
-		put("Blood", new HashSet<String>(){{
-		}});
+        put("Sample", new HashSet<String>(){{
+        	add("Freezer/retrieve");
+        }});
 	}};
-
+	
 	public UUID generateCapability(String resource, MultivaluedMap<String, String> QPmap, String body, Boolean POST){
 
 		String role;
-
+		
 		if (POST) {
 			role = getRoleByOrganization(QPmap.getFirst("UserID"), QPmap.getFirst("OrganizationID"));
 		} else {
@@ -42,55 +59,43 @@ public class Shield {
 				return null;
 			}
 		}
-
+		
 		if(capabilityRequiringResources.contains(resource)){
 			return null;
 		}
-
+		
 		return capabilityHandler.addCapability(QPmap.getFirst("UserID"), resource);
 	}
-
-	public Shield(){}
-	public Shield(InformationServiceInterface informationService, HashSet<String> rolePolicyFreeActions,
-				  HashSet<String> capabilityRequiringResources, HashMap<String, HashSet> entityPolicyRequiringResources,
-				  PolicyHandler policyHandler, CapabilityHandler capabilityHandler){
-		this.informationService = informationService;
-		rolePolicyFreeResources = rolePolicyFreeActions;
-		Shield.capabilityRequiringResources = capabilityRequiringResources;
-		Shield.entityPolicyRequiringResources = entityPolicyRequiringResources;
-		this.policyHandler = policyHandler;
-		this.capabilityHandler = capabilityHandler;
-	}
-
-
-	// UserID, (EntityID) OrganizationID
+	
 	public boolean postAuthorize(String resource, MultivaluedMap<String, String> QPmap, String body){
 		String role = QPmap.getFirst("Role");
 		String UserID = QPmap.getFirst("UserID");
-
+				
 		// Check role policy
 		if(!rolePolicyFreeResources.contains(resource)){
 			if(!policyHandler.roleAuthorize(role, resource, QPmap, body)){
-				throw new WebApplicationException("RP: Permission denied", Response.Status.FORBIDDEN);
+				throw new WebApplicationException("Permission denied", Response.Status.FORBIDDEN);
 			}
 		}
 
+		
 		// Check capability
 		if(capabilityRequiringResources.contains(resource)){
 			String tempCapID = QPmap.getFirst("CapabilityID");
 			if (UserID == null || tempCapID == null){
-				throw new WebApplicationException("CP: Missing input", Response.Status.BAD_REQUEST);
+				throw new WebApplicationException("Missing input", Response.Status.BAD_REQUEST);
 			}
-
+		
 			UUID CapabilityID = UUID.fromString(tempCapID);
 			if(!capabilityHandler.authorize(UserID, CapabilityID, resource)){
-				throw new WebApplicationException("CP: Invalid capability", Response.Status.FORBIDDEN);
+				throw new WebApplicationException("Invalid capability", Response.Status.FORBIDDEN);
 			}
 		}
 		return true;
 	}
 
 	public boolean authorize(String resource, MultivaluedMap<String, String> QPmap, String body){
+
 		String UserID = QPmap.getFirst("UserID");
 		String EntityID = QPmap.getFirst("EntityID");
 		String role = getRoleByEntity(UserID, EntityID);
@@ -101,7 +106,7 @@ public class Shield {
 				throw new WebApplicationException("RP: Permission denied", Response.Status.FORBIDDEN);
 			}
 		}
-
+		
 		// Check entity policy
 		String entityType = informationService.getEntityType(QPmap);
 		if(entityPolicyRequiringResources.get(entityType).contains(resource)){
@@ -109,17 +114,17 @@ public class Shield {
 				throw new WebApplicationException("EP: Permission denied", Response.Status.FORBIDDEN);
 			}
 		}
-
+		
 		// Check capability
 		if(capabilityRequiringResources.contains(resource)){
 			String tempCapID = QPmap.getFirst("CapabilityID");
 			if (UserID == null || tempCapID == null){
 				throw new WebApplicationException("CP: Missing input", Response.Status.BAD_REQUEST);
 			}
-
+		
 			UUID CapabilityID = UUID.fromString(tempCapID);
 			if(!capabilityHandler.authorize(UserID, CapabilityID, resource)){
-				throw new WebApplicationException("CP: Obligation policy violated", Response.Status.FORBIDDEN);
+				throw new WebApplicationException("CP: Invalid capability", Response.Status.FORBIDDEN);
 			}
 		}
 		return true;
